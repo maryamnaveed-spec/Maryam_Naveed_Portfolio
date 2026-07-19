@@ -1,0 +1,59 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export type ArtItem = {
+  id: string;
+  title: string;
+  category: 'art' | 'calligraphy';
+  subcategory: string;
+  description: string | null;
+  image_url: string;
+  created_at: string;
+};
+
+export type BookItem = {
+  id: string;
+  title: string;
+  author: string | null;
+  language: 'Urdu' | 'English';
+  cover_image_url: string | null;
+  pdf_url: string;
+  review: string | null;
+  rating: number;
+  created_at: string;
+};
+
+export type MessageItem = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+};
+
+export type BlogItem = {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  cover_image_url: string | null;
+  created_at: string;
+};
+
+export type CommentItem = {
+  id: string;
+  item_type: 'art' | 'book';
+  item_id: string;
+  name: string;
+  comment: string;
+  created_at: string;
+};
+
+export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];
+export const CALLIGRAPHY_SUBCATEGORIES = ['All Names', 'Quranic Verses', 'English', 'Names'];
+export const BLOG_CATEGORIES = ['Psychology', 'Librarian', 'Islamic', 'Aqwal', 'Motivational'];
