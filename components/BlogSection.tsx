@@ -65,7 +65,7 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
                     {blog.category}
                   </span>
                   <span className="text-[11px] text-inksoft/70">
-                    {new Date(blog.created_at).toLocaleDateString(undefined, {
+                    {new Date(blog.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric'
                     })}

@@ -93,7 +93,7 @@ export default function CommentsBox({
             <div key={c.id} className="text-sm">
               <span className="font-semibold">{c.name}</span>
               <span className="text-inksoft/60 text-xs ml-2">
-                {new Date(c.created_at).toLocaleDateString()}
+                {new Date(c.created_at).toLocaleDateString('en-US')}
               </span>
               <p className="text-inksoft">{c.comment}</p>
             </div>

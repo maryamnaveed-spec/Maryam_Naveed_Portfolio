@@ -130,6 +130,9 @@ export default function Header() {
           >
             Blog
           </button>
+          <Link href="/recite" className="hover:text-pink-600 transition-colors">
+            Recite
+          </Link>
           <Link href="/about" className="hover:text-pink-600 transition-colors">
             Owner
           </Link>
@@ -192,6 +195,13 @@ export default function Header() {
           >
             Blog
           </button>
+          <Link
+            href="/recite"
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
+          >
+            Recite
+          </Link>
           <Link
             href="/about"
             onClick={() => setMenuOpen(false)}

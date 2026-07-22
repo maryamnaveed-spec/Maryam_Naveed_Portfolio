@@ -54,6 +54,12 @@ export type CommentItem = {
   created_at: string;
 };
 
+export type SettingsItem = {
+  id: number;
+  comments_enabled: boolean;
+  quote_of_day: string;
+};
+
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];
 export const CALLIGRAPHY_SUBCATEGORIES = ['All Names', 'Quranic Verses', 'English', 'Names'];
 export const BLOG_CATEGORIES = ['Psychology', 'Librarian', 'Islamic', 'Aqwal', 'Motivational'];

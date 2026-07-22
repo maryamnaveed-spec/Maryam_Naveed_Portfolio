@@ -157,13 +157,13 @@ function AdminPanel() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex gap-2 bg-pink-50 p-1 rounded-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex gap-2 bg-pink-50 p-1 rounded-full overflow-x-auto max-w-full">
           {(['messages', 'upload', 'manage', 'settings'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`relative text-sm font-semibold px-4 py-2 rounded-full capitalize transition-colors ${
+              className={`relative text-sm font-semibold px-4 py-2 rounded-full capitalize transition-colors whitespace-nowrap flex-shrink-0 ${
                 tab === t ? 'bg-white shadow text-pink-600' : 'text-inksoft'
               }`}
             >
@@ -178,7 +178,7 @@ function AdminPanel() {
         </div>
         <button
           onClick={() => supabase.auth.signOut()}
-          className="text-xs font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50"
+          className="text-xs font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 self-start sm:self-auto"
         >
           Sign out
         </button>

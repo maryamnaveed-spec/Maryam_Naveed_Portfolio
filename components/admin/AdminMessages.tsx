@@ -72,7 +72,7 @@ export default function AdminMessages() {
             <p className="text-sm text-inksoft mb-3 whitespace-pre-wrap">{msg.message}</p>
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-inksoft/70">
-                {new Date(msg.created_at).toLocaleString()}
+                {new Date(msg.created_at).toLocaleString('en-US')}
               </span>
               <div className="flex gap-2">
                 {!msg.is_read && (

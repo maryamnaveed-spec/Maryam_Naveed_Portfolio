@@ -42,7 +42,7 @@ export default function BlogModal({
               </button>
             </div>
             <p className="text-xs text-inksoft/70 mb-5">
-              {new Date(blog.created_at).toLocaleDateString(undefined, {
+              {new Date(blog.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'

@@ -12,6 +12,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://mozilla.github.io" />
+        <link rel="dns-prefetch" href="https://mozilla.github.io" />
+      </head>
       <body>
         <ThemeProvider>
           <FiltersProvider>

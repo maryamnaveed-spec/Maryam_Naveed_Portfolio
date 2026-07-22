@@ -5,6 +5,8 @@ import CategoryFilterGrid from './CategoryFilterGrid';
 import LibrarySection from './LibrarySection';
 import BlogSection from './BlogSection';
 import FeaturedCarousel from './FeaturedCarousel';
+import AnimatedCounters from './AnimatedCounters';
+import HighlightsSection from './HighlightsSection';
 import Reveal from './Reveal';
 import { useFilters } from './FiltersProvider';
 import { ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES } from '@/lib/supabase';
@@ -13,15 +15,27 @@ export default function HomeSections({
   artItems,
   calligraphyItems,
   books,
-  blogs
+  blogs,
+  quoteOfDay
 }: {
   artItems: ArtItem[];
   calligraphyItems: ArtItem[];
   books: BookItem[];
   blogs: BlogItem[];
+  quoteOfDay: string;
 }) {
   const { artFilter, setArtFilter, calligraphyFilter, setCalligraphyFilter } = useFilters();
   const featured = [...artItems, ...calligraphyItems].slice(0, 6);
+  const featuredArt = featured[0] ?? null;
+  const featuredBook =
+    [...books].sort((a, b) => b.rating - a.rating)[0] ?? null;
+
+  const artworkCount = artItems.length + calligraphyItems.length;
+  const bookCount = books.length;
+  const averageRating =
+    books.length > 0
+      ? books.reduce((sum, b) => sum + b.rating, 0) / books.length
+      : 0;
 
   return (
     <>
@@ -34,6 +48,30 @@ export default function HomeSections({
           </div>
         </section>
       )}
+
+      <section className="py-8">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <Reveal>
+            <AnimatedCounters
+              artworkCount={artworkCount}
+              bookCount={bookCount}
+              averageRating={averageRating}
+            />
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="py-8">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <Reveal>
+            <HighlightsSection
+              featuredArt={featuredArt}
+              featuredBook={featuredBook}
+              quote={quoteOfDay}
+            />
+          </Reveal>
+        </div>
+      </section>
 
       <section id="art" className="py-14">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">

@@ -6,8 +6,57 @@ import { supabase } from '@/lib/supabase';
 export default function AdminSettings() {
   return (
     <div className="space-y-6">
+      <QuoteOfDayEditor />
       <CommentsToggle />
       <ChangePasswordForm />
+    </div>
+  );
+}
+
+function QuoteOfDayEditor() {
+  const [quote, setQuote] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<'idle' | 'saving' | 'done'>('idle');
+
+  useEffect(() => {
+    supabase
+      .from('settings')
+      .select('quote_of_day')
+      .eq('id', 1)
+      .single()
+      .then(({ data }) => {
+        setQuote(data?.quote_of_day ?? '');
+        setLoading(false);
+      });
+  }, []);
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus('saving');
+    await supabase.from('settings').update({ quote_of_day: quote }).eq('id', 1);
+    setStatus('done');
+    setTimeout(() => setStatus('idle'), 2000);
+  }
+
+  return (
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
+      <h3 className="text-lg mb-3">Quote of the Day</h3>
+      <p className="text-sm text-inksoft mb-4">
+        This quote appears in the homepage highlights section.
+      </p>
+      {!loading && (
+        <form onSubmit={handleSave}>
+          <textarea
+            value={quote}
+            onChange={(e) => setQuote(e.target.value)}
+            rows={3}
+            className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+          />
+          <button className="text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
+            {status === 'saving' ? 'Saving...' : status === 'done' ? 'Saved ✓' : 'Save quote'}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
