@@ -9,9 +9,11 @@ create table if not exists arts (
   subcategory text not null default 'All',
   description text,
   image_url text not null,
+  before_after_gif_url text,
   created_at timestamp with time zone default now()
 );
 alter table arts add column if not exists subcategory text not null default 'All';
+alter table arts add column if not exists before_after_gif_url text;
 alter table arts enable row level security;
 
 drop policy if exists "Public can read arts" on arts;
@@ -117,11 +119,13 @@ create policy "Authenticated can delete blogs"
 create table if not exists settings (
   id int primary key default 1,
   comments_enabled boolean not null default true,
-  quote_of_day text not null default 'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.'
+  quote_of_day text not null default 'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.',
+  background_image_url text
 );
 insert into settings (id, comments_enabled) values (1, true)
 on conflict (id) do nothing;
 alter table settings add column if not exists quote_of_day text not null default 'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.';
+alter table settings add column if not exists background_image_url text;
 alter table settings enable row level security;
 
 drop policy if exists "Public can read settings" on settings;
@@ -136,10 +140,14 @@ create table if not exists comments (
   id uuid primary key default gen_random_uuid(),
   item_type text not null check (item_type in ('art', 'book')),
   item_id uuid not null,
+  item_title text,
   name text not null,
   comment text not null,
+  is_read boolean not null default false,
   created_at timestamp with time zone default now()
 );
+alter table comments add column if not exists item_title text;
+alter table comments add column if not exists is_read boolean not null default false;
 alter table comments enable row level security;
 
 drop policy if exists "Public can read comments" on comments;
@@ -149,9 +157,31 @@ drop policy if exists "Public can add comments" on comments;
 create policy "Public can add comments"
   on comments for insert to anon, authenticated with check (true);
 
+drop policy if exists "Authenticated can update comments" on comments;
+create policy "Authenticated can update comments"
+  on comments for update to authenticated using (true);
+
 drop policy if exists "Authenticated can delete comments" on comments;
 create policy "Authenticated can delete comments"
   on comments for delete to authenticated using (true);
+
+-- Storage bucket for before/after GIFs
+insert into storage.buckets (id, name, public) values ('art-before-after', 'art-before-after', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('site-backgrounds', 'site-backgrounds', true) on conflict (id) do nothing;
+
+drop policy if exists "Public read art-before-after" on storage.objects;
+create policy "Public read art-before-after" on storage.objects for select using (bucket_id = 'art-before-after');
+
+drop policy if exists "Authenticated upload art-before-after" on storage.objects;
+create policy "Authenticated upload art-before-after"
+  on storage.objects for insert to authenticated with check (bucket_id = 'art-before-after');
+
+drop policy if exists "Public read site-backgrounds" on storage.objects;
+create policy "Public read site-backgrounds" on storage.objects for select using (bucket_id = 'site-backgrounds');
+
+drop policy if exists "Authenticated upload site-backgrounds" on storage.objects;
+create policy "Authenticated upload site-backgrounds"
+  on storage.objects for insert to authenticated with check (bucket_id = 'site-backgrounds');
 
 -- ============ 7. STORAGE BUCKETS ============
 insert into storage.buckets (id, name, public) values ('art-images', 'art-images', true) on conflict (id) do nothing;

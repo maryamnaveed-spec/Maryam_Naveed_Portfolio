@@ -33,25 +33,12 @@ async function getBlogs(): Promise<BlogItem[]> {
   return data ?? [];
 }
 
-async function getQuoteOfDay(): Promise<string> {
-  const { data } = await supabase
-    .from('settings')
-    .select('quote_of_day')
-    .eq('id', 1)
-    .single();
-  return (
-    data?.quote_of_day ??
-    'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.'
-  );
-}
-
 export default async function HomePage() {
-  const [artItems, calligraphyItems, books, blogs, quoteOfDay] = await Promise.all([
+  const [artItems, calligraphyItems, books, blogs] = await Promise.all([
     getArts('art'),
     getArts('calligraphy'),
     getBooks(),
-    getBlogs(),
-    getQuoteOfDay()
+    getBlogs()
   ]);
 
   return (
@@ -72,7 +59,6 @@ export default async function HomePage() {
         calligraphyItems={calligraphyItems}
         books={books}
         blogs={blogs}
-        quoteOfDay={quoteOfDay}
       />
 
       <footer className="py-10 text-center text-sm text-inksoft">

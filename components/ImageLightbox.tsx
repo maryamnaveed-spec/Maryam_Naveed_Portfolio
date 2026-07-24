@@ -47,7 +47,7 @@ export default function ImageLightbox({
           {item.description && (
             <p className="text-sm text-inksoft">{item.description}</p>
           )}
-          <CommentsBox itemType="art" itemId={item.id} />
+          <CommentsBox itemType="art" itemId={item.id} itemTitle={item.title} />
         </div>
       </div>
 

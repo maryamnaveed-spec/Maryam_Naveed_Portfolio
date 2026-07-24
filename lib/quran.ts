@@ -61,3 +61,11 @@ export function surahAudioUrl(surahNumber: number) {
   return `${AUDIO_SURAH_BASE}/${surahNumber}.mp3`;
 }
 
+// Five frequently recited surahs
+export const PUNJ_SURAH_NUMBERS = [
+  1,   // Al-Fatihah
+  36,  // Ya-Sin
+  55,  // Ar-Rahman
+  67,  // Al-Mulk
+  78   // An-Naba
+];

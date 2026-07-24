@@ -1,0 +1,9 @@
+Place your hero background image here, named exactly:
+
+  hero-bgf.png
+
+Full path should be: public/images/hero-bgf.png
+
+The Hero component references it as '/images/hero-bgf.png'.
+Recommended: a landscape photo, 1920x1080 or larger, under 500KB
+(compress it first) so the homepage still loads fast.

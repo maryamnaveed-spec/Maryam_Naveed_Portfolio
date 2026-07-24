@@ -53,7 +53,7 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
                   src={blog.cover_image_url}
                   alt={blog.title}
                   className="w-full h-40 object-cover"
-                />
+                loading="lazy" />
               ) : (
                 <div className="w-full h-40 bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center text-3xl">
                   ✍️

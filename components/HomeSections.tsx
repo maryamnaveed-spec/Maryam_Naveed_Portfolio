@@ -15,14 +15,12 @@ export default function HomeSections({
   artItems,
   calligraphyItems,
   books,
-  blogs,
-  quoteOfDay
+  blogs
 }: {
   artItems: ArtItem[];
   calligraphyItems: ArtItem[];
   books: BookItem[];
   blogs: BlogItem[];
-  quoteOfDay: string;
 }) {
   const { artFilter, setArtFilter, calligraphyFilter, setCalligraphyFilter } = useFilters();
   const featured = [...artItems, ...calligraphyItems].slice(0, 6);
@@ -67,7 +65,6 @@ export default function HomeSections({
             <HighlightsSection
               featuredArt={featuredArt}
               featuredBook={featuredBook}
-              quote={quoteOfDay}
             />
           </Reveal>
         </div>

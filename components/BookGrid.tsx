@@ -29,7 +29,7 @@ export default function BookGrid({ books }: { books: BookItem[] }) {
                   src={book.cover_image_url}
                   alt={book.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                loading="lazy" />
               ) : (
                 '📖'
               )}

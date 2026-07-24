@@ -5,10 +5,12 @@ import { supabase, CommentItem } from '@/lib/supabase';
 
 export default function CommentsBox({
   itemType,
-  itemId
+  itemId,
+  itemTitle
 }: {
   itemType: 'art' | 'book';
   itemId: string;
+  itemTitle: string;
 }) {
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [comments, setComments] = useState<CommentItem[]>([]);
@@ -42,7 +44,7 @@ export default function CommentsBox({
 
     const { data, error } = await supabase
       .from('comments')
-      .insert({ item_type: itemType, item_id: itemId, name, comment: text })
+      .insert({ item_type: itemType, item_id: itemId, item_title: itemTitle, name, comment: text, is_read: false })
       .select()
       .single();
 

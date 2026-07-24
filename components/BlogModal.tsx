@@ -28,7 +28,7 @@ export default function BlogModal({
               src={blog.cover_image_url}
               alt={blog.title}
               className="w-full h-56 object-cover"
-            />
+            loading="lazy" />
           )}
           <div className="p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4 mb-2">

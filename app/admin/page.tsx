@@ -8,6 +8,7 @@ import AdminManageArts from '@/components/admin/AdminManageArts';
 import AdminManageBooks from '@/components/admin/AdminManageBooks';
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminManageBlogs from '@/components/admin/AdminManageBlogs';
+import AdminReviews from '@/components/admin/AdminReviews';
 
 export default function AdminPage() {
   const [session, setSession] = useState<Session | null>(null);
@@ -144,8 +145,9 @@ function LoginForm() {
 }
 
 function AdminPanel() {
-  const [tab, setTab] = useState<'upload' | 'manage' | 'messages' | 'settings'>('messages');
+  const [tab, setTab] = useState<'upload' | 'manage' | 'messages' | 'settings' | 'reviews'>('messages');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadReviews, setUnreadReviews] = useState(0);
 
   useEffect(() => {
     supabase
@@ -153,13 +155,18 @@ function AdminPanel() {
       .select('*', { count: 'exact', head: true })
       .eq('is_read', false)
       .then(({ count }) => setUnreadCount(count ?? 0));
+    supabase
+      .from('comments')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false)
+      .then(({ count }) => setUnreadReviews(count ?? 0));
   }, [tab]);
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div className="flex gap-2 bg-pink-50 p-1 rounded-full overflow-x-auto max-w-full">
-          {(['messages', 'upload', 'manage', 'settings'] as const).map((t) => (
+          {(['messages', 'reviews', 'upload', 'manage', 'settings'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -171,6 +178,11 @@ function AdminPanel() {
               {t === 'messages' && unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full">
                   {unreadCount}
+                </span>
+              )}
+              {t === 'reviews' && unreadReviews > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full">
+                  {unreadReviews}
                 </span>
               )}
             </button>
@@ -185,6 +197,8 @@ function AdminPanel() {
       </div>
 
       {tab === 'messages' && <AdminMessages />}
+
+      {tab === 'reviews' && <AdminReviews />}
 
       {tab === 'upload' && (
         <div className="space-y-10">
@@ -218,6 +232,7 @@ function ArtUploadForm({
 }) {
   const [form, setForm] = useState({ title: '', description: '', subcategory: '' });
   const [file, setFile] = useState<File | null>(null);
+  const [gifFile, setGifFile] = useState<File | null>(null);
   const [status, setStatus] = useState('');
 
   const subcategoryOptions =
@@ -240,13 +255,25 @@ function ArtUploadForm({
         .from('art-images')
         .getPublicUrl(filePath);
 
+      let gifUrl: string | null = null;
+      if (gifFile) {
+        setStatus('Uploading before/after GIF...');
+        const gifPath = `${category}/${Date.now()}-${gifFile.name}`;
+        const { error: gifError } = await supabase.storage
+          .from('art-before-after')
+          .upload(gifPath, gifFile);
+        if (gifError) throw new Error(`GIF upload failed: ${gifError.message}`);
+        gifUrl = supabase.storage.from('art-before-after').getPublicUrl(gifPath).data.publicUrl;
+      }
+
       setStatus('Saving details...');
       const { error: insertError } = await supabase.from('arts').insert({
         title: form.title,
         category,
         subcategory: form.subcategory || subcategoryOptions[0],
         description: form.description,
-        image_url: publicUrl.publicUrl
+        image_url: publicUrl.publicUrl,
+        before_after_gif_url: gifUrl
       });
       if (insertError) throw new Error(`Saving details failed: ${insertError.message}`);
     } catch (err: any) {
@@ -257,6 +284,7 @@ function ArtUploadForm({
     setStatus('Uploaded successfully. Refresh the homepage to see it.');
     setForm({ title: '', description: '', subcategory: '' });
     setFile(null);
+    setGifFile(null);
   }
 
   return (
@@ -297,6 +325,16 @@ function ArtUploadForm({
         accept="image/*"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
         required
+        className="text-sm mb-3"
+      />
+      <br />
+      <label className="block text-xs font-semibold mb-1.5">
+        Before/After GIF (optional)
+      </label>
+      <input
+        type="file"
+        accept="image/gif,image/*"
+        onChange={(e) => setGifFile(e.target.files?.[0] ?? null)}
         className="text-sm mb-3"
       />
       <br />

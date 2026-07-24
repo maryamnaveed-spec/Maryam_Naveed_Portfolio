@@ -67,7 +67,7 @@ export default function BookReaderModal({
                     src={book.cover_image_url}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
-                  />
+                  loading="lazy" />
                 )}
                 <div className="relative w-8 h-8 rounded-full border-2 border-pink-200 border-t-pink-600 animate-spin" />
                 <span className="relative">Opening book...</span>
@@ -83,7 +83,7 @@ export default function BookReaderModal({
 
           {showComments && (
             <div className="max-h-56 overflow-y-auto px-4 sm:px-5 py-3 border-t border-borderpink bg-pink-50/40">
-              <CommentsBox itemType="book" itemId={book.id} />
+              <CommentsBox itemType="book" itemId={book.id} itemTitle={book.title} />
             </div>
           )}
 

@@ -12,6 +12,7 @@ export type ArtItem = {
   subcategory: string;
   description: string | null;
   image_url: string;
+  before_after_gif_url: string | null;
   created_at: string;
 };
 
@@ -49,8 +50,10 @@ export type CommentItem = {
   id: string;
   item_type: 'art' | 'book';
   item_id: string;
+  item_title: string | null;
   name: string;
   comment: string;
+  is_read: boolean;
   created_at: string;
 };
 
@@ -58,6 +61,7 @@ export type SettingsItem = {
   id: number;
   comments_enabled: boolean;
   quote_of_day: string;
+  background_image_url: string | null;
 };
 
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];
