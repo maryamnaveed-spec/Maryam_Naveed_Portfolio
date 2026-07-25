@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import FeedbackButton from './FeedbackButton';
 import {
   ART_SUBCATEGORIES,
-  CALLIGRAPHY_SUBCATEGORIES
+  CALLIGRAPHY_SUBCATEGORIES,
+  supabase
 } from '@/lib/supabase';
 import { useFilters } from './FiltersProvider';
 
@@ -63,6 +64,7 @@ function NavDropdown({
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const { setArtFilter, setCalligraphyFilter } = useFilters();
   const router = useRouter();
   const pathname = usePathname();
@@ -71,6 +73,15 @@ export default function Header() {
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from('settings')
+      .select('profile_image_url')
+      .eq('id', 1)
+      .single()
+      .then(({ data }) => setProfileImage(data?.profile_image_url ?? null));
   }, []);
 
   // Works from any page: if we're already on the homepage, just smooth-scroll;
@@ -92,8 +103,13 @@ export default function Header() {
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-lg shadow-md shadow-pink-400/20">
-            MN
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-lg shadow-md shadow-pink-400/20">
+            {profileImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profileImage} alt="Maryam Naveed" className="w-full h-full object-cover" />
+            ) : (
+              'MN'
+            )}
           </div>
           <div>
             <div className="font-display font-semibold text-lg sm:text-xl leading-tight">

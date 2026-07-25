@@ -5,12 +5,14 @@ import CalligraphyAnimation from './CalligraphyAnimation';
 import Bookshelf3D from './Bookshelf3D';
 import ParticlesBackground from './ParticlesBackground';
 
-export default function Hero() {
+export default function Hero({ backgroundImage }: { backgroundImage?: string | null }) {
+  const bgUrl = backgroundImage || '/images/hero-bgf.png';
+
   return (
     <section
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-cover bg-center bg-no-repeat py-16 sm:py-0"
       style={{
-        backgroundImage: "url('/images/hero-bgf.png')",
+        backgroundImage: `url('${bgUrl}')`,
       }}
     >
       <style jsx>{`

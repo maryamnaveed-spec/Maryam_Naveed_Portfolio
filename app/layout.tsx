@@ -3,6 +3,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { FiltersProvider } from '@/components/FiltersProvider';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
+import CustomCursor from '@/components/CustomCursor';
 
 export const metadata: Metadata = {
   title: 'Maryam Naveed — Curator of Mind & Art',
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <FiltersProvider>
             {children}
             <ThemeSwitcher />
+            <CustomCursor />
           </FiltersProvider>
         </ThemeProvider>
       </body>

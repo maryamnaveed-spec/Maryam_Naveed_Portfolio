@@ -62,6 +62,7 @@ export type SettingsItem = {
   comments_enabled: boolean;
   quote_of_day: string;
   background_image_url: string | null;
+  profile_image_url: string | null;
 };
 
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];

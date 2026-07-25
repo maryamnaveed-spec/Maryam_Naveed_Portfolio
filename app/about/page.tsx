@@ -1,11 +1,26 @@
 import Header from '@/components/Header';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
+
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'About Maryam Naveed'
 };
 
-export default function AboutPage() {
+async function getProfileImage(): Promise<string | null> {
+  const { data } = await supabase
+    .from('settings')
+    .select('profile_image_url')
+    .eq('id', 1)
+    .single();
+  return data?.profile_image_url ?? null;
+}
+
+export default async function AboutPage() {
+  const profileImage = await getProfileImage();
+
   return (
     <main>
       <Header />
@@ -16,8 +31,13 @@ export default function AboutPage() {
 
         <div className="max-w-4xl mx-auto px-5 sm:px-8 relative">
           <div className="text-center mb-10">
-            <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-3xl shadow-xl mb-4">
-              MN
+            <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-3xl shadow-xl mb-4">
+              {profileImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profileImage} alt="Maryam Naveed" className="w-full h-full object-cover" />
+              ) : (
+                'MN'
+              )}
             </div>
             <span className="inline-block text-[11px] font-semibold tracking-wide uppercase text-pink-600 bg-pink-50 px-4 py-1.5 rounded-full mb-3">
               About the curator
