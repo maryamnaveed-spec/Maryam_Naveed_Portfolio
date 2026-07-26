@@ -5,12 +5,98 @@ import { supabase } from '@/lib/supabase';
 
 export default function AdminSettings() {
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-stretch">
       <ProfileImageEditor />
       <BackgroundImageEditor />
+      <ResumeFileEditor />
       <QuoteOfDayEditor />
       <CommentsToggle />
       <ChangePasswordForm />
+    </div>
+  );
+}
+
+function ResumeFileEditor() {
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    supabase
+      .from('settings')
+      .select('resume_url')
+      .eq('id', 1)
+      .single()
+      .then(({ data }) => {
+        setCurrentUrl(data?.resume_url ?? null);
+        setLoading(false);
+      });
+  }, []);
+
+  async function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!file) return setStatus('Please choose a PDF file.');
+    if (file.type !== 'application/pdf') return setStatus('Please choose a PDF file.');
+
+    try {
+      setStatus('Uploading...');
+      const path = `${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('resume-files')
+        .upload(path, file);
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: publicUrl } = supabase.storage.from('resume-files').getPublicUrl(path);
+
+      const { error: updateError } = await supabase
+        .from('settings')
+        .update({ resume_url: publicUrl.publicUrl })
+        .eq('id', 1);
+      if (updateError) throw new Error(updateError.message);
+
+      setCurrentUrl(publicUrl.publicUrl);
+      setFile(null);
+      setStatus('Resume updated. Approved requesters will now get this file.');
+    } catch (err: any) {
+      setStatus(err.message || 'Something went wrong.');
+    }
+  }
+
+  return (
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-3 flex items-center gap-2">
+        <span aria-hidden="true">📄</span> Resume / CV file
+      </h3>
+      <p className="text-sm text-inksoft mb-4">
+        This PDF is what visitors download once you approve their &ldquo;Request
+        Resume&rdquo; request from the Resume tab.
+      </p>
+
+      {!loading && currentUrl && (
+        <a
+          href={currentUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block mb-4 text-xs font-semibold px-3 py-1.5 rounded-full border border-borderpink text-inksoft hover:bg-pink-50"
+        >
+          View current resume ↗
+        </a>
+      )}
+
+      <form onSubmit={handleUpload}>
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          className="text-sm mb-3"
+        />
+        <br />
+        <button className="text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
+          Upload resume
+        </button>
+      </form>
+      {status && <p className="text-xs text-inksoft mt-3">{status}</p>}
     </div>
   );
 }
@@ -68,8 +154,10 @@ function ProfileImageEditor() {
   }
 
   return (
-    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
-      <h3 className="text-lg mb-3">Profile photo</h3>
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-3 flex items-center gap-2">
+        <span aria-hidden="true">🖼️</span> Profile photo
+      </h3>
       <p className="text-sm text-inksoft mb-4">
         This photo replaces the "MN" circle logo in the navigation bar across
         the whole site.
@@ -151,8 +239,10 @@ function QuoteOfDayEditor() {
   }
 
   return (
-    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
-      <h3 className="text-lg mb-3">Quote of the Day</h3>
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-3 flex items-center gap-2">
+        <span aria-hidden="true">💬</span> Quote of the Day
+      </h3>
       <p className="text-sm text-inksoft mb-4">
         Appears next to Artwork of the Week and Book of the Month on the
         homepage.
@@ -228,12 +318,15 @@ function BackgroundImageEditor() {
   }
 
   return (
-    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
-      <h3 className="text-lg mb-3">Homepage background</h3>
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-3 flex items-center gap-2">
+        <span aria-hidden="true">🏞️</span> Homepage background
+      </h3>
       <p className="text-sm text-inksoft mb-4">
-        Upload an HD photo to replace the homepage hero background. It will
-        automatically be cropped to fill the same space and size as the
-        current one — no layout changes.
+        Upload an HD photo to replace the homepage hero background. It
+        automatically fills the same space on desktop and mobile, keeping
+        the top of the photo in frame on phones so nothing important gets
+        cropped out.
       </p>
 
       {!loading && currentUrl && (
@@ -293,8 +386,10 @@ function CommentsToggle() {
   }
 
   return (
-    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
-      <h3 className="text-lg mb-3">Reader comments</h3>
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-3 flex items-center gap-2">
+        <span aria-hidden="true">💭</span> Reader comments
+      </h3>
       <p className="text-sm text-inksoft mb-4">
         Allow visitors to leave a comment/view on your art, calligraphy and
         books.
@@ -370,8 +465,10 @@ function ChangePasswordForm() {
   }
 
   return (
-    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow max-w-md">
-      <h3 className="text-lg mb-4">Change password</h3>
+    <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+      <h3 className="text-lg mb-4 flex items-center gap-2">
+        <span aria-hidden="true">🔒</span> Change password
+      </h3>
       <form onSubmit={handleSubmit}>
         <label className="block text-xs font-semibold mb-1.5">Current password</label>
         <input

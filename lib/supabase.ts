@@ -63,6 +63,27 @@ export type SettingsItem = {
   quote_of_day: string;
   background_image_url: string | null;
   profile_image_url: string | null;
+  resume_url: string | null;
+};
+
+export type ResumeRequestStatus = 'pending' | 'approved' | 'rejected' | 'downloaded';
+
+export type ResumeRequestItem = {
+  id: string;
+  name: string;
+  reason: string;
+  status: ResumeRequestStatus;
+  created_at: string;
+};
+
+export type ChatMessageItem = {
+  id: string;
+  visitor_id: string;
+  name: string;
+  sender: 'user' | 'admin';
+  message: string;
+  is_read: boolean;
+  created_at: string;
 };
 
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];

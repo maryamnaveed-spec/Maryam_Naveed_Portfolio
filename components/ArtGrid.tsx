@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { ArtItem } from '@/lib/supabase';
 import ImageLightbox from './ImageLightbox';
+import ShareButtons from './ShareButtons';
 
 export default function ArtGrid({
   items,
@@ -24,7 +25,7 @@ export default function ArtGrid({
 
   return (
     <>
-      <div className="grid md:grid-cols-3 gap-5">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {items.map((item) => (
           <div
             key={item.id}
@@ -68,6 +69,7 @@ export default function ArtGrid({
               {item.description && (
                 <p className="text-xs text-inksoft">{item.description}</p>
               )}
+              <ShareButtons title={item.title} imageUrl={item.image_url} />
             </div>
           </div>
         ))}

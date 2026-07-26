@@ -128,6 +128,7 @@ on conflict (id) do nothing;
 alter table settings add column if not exists quote_of_day text not null default 'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.';
 alter table settings add column if not exists background_image_url text;
 alter table settings add column if not exists profile_image_url text;
+alter table settings add column if not exists resume_url text;
 alter table settings enable row level security;
 
 drop policy if exists "Public can read settings" on settings;
@@ -167,6 +168,69 @@ drop policy if exists "Authenticated can delete comments" on comments;
 create policy "Authenticated can delete comments"
   on comments for delete to authenticated using (true);
 
+-- ============ 8. RESUME REQUESTS table (Nav "Request Resume" flow) ============
+create table if not exists resume_requests (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  reason text not null,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'downloaded')),
+  created_at timestamp with time zone default now()
+);
+alter table resume_requests enable row level security;
+
+-- Widen the status check for databases that already ran an earlier version
+-- of this schema (before "downloaded" existed as a status).
+alter table resume_requests drop constraint if exists resume_requests_status_check;
+alter table resume_requests add constraint resume_requests_status_check
+  check (status in ('pending', 'approved', 'rejected', 'downloaded'));
+
+drop policy if exists "Public can send resume requests" on resume_requests;
+create policy "Public can send resume requests"
+  on resume_requests for insert to anon, authenticated with check (true);
+
+-- Visitor needs to read back the status of their own request id from the
+-- browser, and there's no visitor login system, so read access is open
+-- (same trust model already used for the "comments" table above).
+drop policy if exists "Public can read resume requests" on resume_requests;
+create policy "Public can read resume requests" on resume_requests for select using (true);
+
+drop policy if exists "Authenticated can update resume requests" on resume_requests;
+create policy "Authenticated can update resume requests"
+  on resume_requests for update to authenticated using (true);
+
+drop policy if exists "Authenticated can delete resume requests" on resume_requests;
+create policy "Authenticated can delete resume requests"
+  on resume_requests for delete to authenticated using (true);
+
+-- ============ 9. CHAT MESSAGES table ("Talk to Admin" widget) ============
+create table if not exists chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  visitor_id text not null,
+  name text not null,
+  sender text not null check (sender in ('user', 'admin')),
+  message text not null,
+  is_read boolean not null default false,
+  created_at timestamp with time zone default now()
+);
+alter table chat_messages enable row level security;
+
+drop policy if exists "Public can send chat messages" on chat_messages;
+create policy "Public can send chat messages"
+  on chat_messages for insert to anon, authenticated with check (true);
+
+-- Visitors poll their own visitor_id thread from the browser (no login
+-- system for visitors), so read access is open, same as "comments" above.
+drop policy if exists "Public can read chat messages" on chat_messages;
+create policy "Public can read chat messages" on chat_messages for select using (true);
+
+drop policy if exists "Authenticated can update chat messages" on chat_messages;
+create policy "Authenticated can update chat messages"
+  on chat_messages for update to authenticated using (true);
+
+drop policy if exists "Authenticated can delete chat messages" on chat_messages;
+create policy "Authenticated can delete chat messages"
+  on chat_messages for delete to authenticated using (true);
+
 -- Storage bucket for before/after GIFs
 insert into storage.buckets (id, name, public) values ('art-before-after', 'art-before-after', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('site-backgrounds', 'site-backgrounds', true) on conflict (id) do nothing;
@@ -198,6 +262,14 @@ insert into storage.buckets (id, name, public) values ('art-images', 'art-images
 insert into storage.buckets (id, name, public) values ('book-pdfs', 'book-pdfs', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('book-covers', 'book-covers', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('blog-covers', 'blog-covers', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('resume-files', 'resume-files', true) on conflict (id) do nothing;
+
+drop policy if exists "Public read resume-files" on storage.objects;
+create policy "Public read resume-files" on storage.objects for select using (bucket_id = 'resume-files');
+
+drop policy if exists "Authenticated upload resume-files" on storage.objects;
+create policy "Authenticated upload resume-files"
+  on storage.objects for insert to authenticated with check (bucket_id = 'resume-files');
 
 drop policy if exists "Public read art-images" on storage.objects;
 create policy "Public read art-images" on storage.objects for select using (bucket_id = 'art-images');

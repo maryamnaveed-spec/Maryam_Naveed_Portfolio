@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import FeedbackButton from './FeedbackButton';
 import CalligraphyAnimation from './CalligraphyAnimation';
 import Bookshelf3D from './Bookshelf3D';
@@ -9,13 +10,32 @@ export default function Hero({ backgroundImage }: { backgroundImage?: string | n
   const bgUrl = backgroundImage || '/images/hero-bgf.png';
 
   return (
-    <section
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-cover bg-center bg-no-repeat py-16 sm:py-0"
-      style={{
-        backgroundImage: `url('${bgUrl}')`,
-      }}
-    >
+    <section className="relative min-h-[100svh] flex items-center overflow-hidden py-16 sm:py-0">
+      {/* Background photo (default, or whatever the admin uploaded). Uses
+          next/image for fast, optimized loading, and a responsive focal
+          point so mobile portrait screens don't get an awkward crop. */}
+      <Image
+        src={bgUrl}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="hero-bg-img"
+      />
+
       <style jsx>{`
+        .hero-bg-img {
+          object-fit: cover;
+          /* On phones (portrait), keep the top ~30% of the photo in frame
+             instead of a dead-center crop, so the interesting part of the
+             image (whatever the admin uploads) doesn't get cut off. */
+          object-position: center 25%;
+        }
+        @media (min-width: 640px) {
+          .hero-bg-img {
+            object-position: center center;
+          }
+        }
         @keyframes fadeInUp {
           from {
             opacity: 0;

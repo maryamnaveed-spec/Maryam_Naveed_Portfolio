@@ -40,7 +40,7 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
       {visible.length === 0 ? (
         <p className="text-sm text-inksoft italic">No blog posts in this category yet.</p>
       ) : (
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {visible.map((blog) => (
             <div
               key={blog.id}
@@ -48,14 +48,17 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
               className="glass-card rounded-card overflow-hidden card-shadow cursor-pointer border border-borderpink transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
             >
               {blog.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={blog.cover_image_url}
-                  alt={blog.title}
-                  className="w-full h-40 object-cover"
-                loading="lazy" />
+                <div className="w-full aspect-[4/3] bg-pink-50 flex items-center justify-center overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={blog.cover_image_url}
+                    alt={blog.title}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               ) : (
-                <div className="w-full h-40 bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center text-3xl">
+                <div className="w-full aspect-[4/3] bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center text-3xl">
                   ✍️
                 </div>
               )}

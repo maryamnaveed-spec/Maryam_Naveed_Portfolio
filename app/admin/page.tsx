@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { supabase, ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES, BLOG_CATEGORIES } from '@/lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 import AdminMessages from '@/components/admin/AdminMessages';
@@ -9,6 +10,8 @@ import AdminManageBooks from '@/components/admin/AdminManageBooks';
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminManageBlogs from '@/components/admin/AdminManageBlogs';
 import AdminReviews from '@/components/admin/AdminReviews';
+import AdminResumeRequests from '@/components/admin/AdminResumeRequests';
+import AdminChat from '@/components/admin/AdminChat';
 
 export default function AdminPage() {
   const [session, setSession] = useState<Session | null>(null);
@@ -29,36 +32,36 @@ export default function AdminPage() {
 
   if (!session) {
     return (
-      <main className="min-h-screen relative overflow-hidden flex items-center justify-center px-5 py-10 bg-gradient-to-br from-[#160C13] via-ink to-[#5A2E4A]">
-        {/* Illustrated bookshelf silhouette running along the background */}
-        <svg
-          className="pointer-events-none absolute inset-0 w-full h-full opacity-[0.16]"
-          preserveAspectRatio="xMidYMid slice"
-          viewBox="0 0 1200 800"
-        >
-          {Array.from({ length: 4 }).map((_, row) => (
-            <g key={row} transform={`translate(0 ${120 + row * 170})`}>
-              {Array.from({ length: 26 }).map((_, i) => {
-                const w = 18 + ((i * 7) % 22);
-                const h = 70 + ((i * 13) % 60);
-                const x = i * 46;
-                const hue = i % 3 === 0 ? '#F4A6C6' : i % 3 === 1 ? '#E9C46A' : '#F1DFB8';
-                return (
-                  <rect
-                    key={i}
-                    x={x}
-                    y={90 - h}
-                    width={w}
-                    height={h}
-                    rx="2"
-                    fill={hue}
-                  />
-                );
-              })}
-              <rect x="0" y="92" width="1200" height="6" fill="#F1DFB8" opacity="0.5" />
-            </g>
-          ))}
-        </svg>
+      <main className="min-h-screen relative overflow-hidden flex items-center justify-center px-5 py-10">
+        {/* Cozy library photo backdrop */}
+        <Image
+          src="/images/admin-login-bg.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        {/* Dark wash so the login card text stays fully readable over the photo */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#160C13]/92 via-[#2a1620]/85 to-[#5A2E4A]/80" />
+
+        {/* Animated spotlight shade directly behind the card, so the login
+            box and its text stay clearly legible no matter how bright the
+            backdrop photo is in that spot */}
+        <div className="admin-login-shade pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] max-w-[95vw] max-h-[95vw] rounded-full" />
+        <style jsx>{`
+          .admin-login-shade {
+            background: radial-gradient(circle, rgba(10, 5, 8, 0.75) 0%, rgba(10, 5, 8, 0.35) 45%, rgba(10, 5, 8, 0) 72%);
+            animation: shadeBreathe 6s ease-in-out infinite;
+          }
+          @keyframes shadeBreathe {
+            0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .admin-login-shade { animation: none; opacity: 0.95; }
+          }
+        `}</style>
 
         {/* Warm reading-lamp glow behind the card */}
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-goldlight/20 blur-[100px]" />
@@ -80,8 +83,17 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-bg">
+      <div className="h-1.5 w-full bg-gradient-to-r from-pink-400 via-gold to-pink-600" />
       <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
-        <h1 className="text-3xl mb-8">Admin dashboard</h1>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-lg shadow-md flex-shrink-0">
+            MN
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl leading-tight">Admin dashboard</h1>
+            <p className="text-xs text-inksoft">Manage your art, calligraphy, books &amp; blog</p>
+          </div>
+        </div>
         <AdminPanel />
       </div>
     </main>
@@ -101,9 +113,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="relative w-full max-w-sm">
+    <div className="relative w-full max-w-sm animate-fadeUp">
       <div className="text-center mb-7">
-        <div className="w-[72px] h-[72px] mx-auto rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-2xl shadow-xl shadow-pink-900/40 mb-4 ring-4 ring-white/10">
+        <div className="w-[76px] h-[76px] mx-auto rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-2xl shadow-xl shadow-pink-900/40 mb-4 ring-4 ring-white/15">
           MN
         </div>
         <h1 className="text-2xl text-white font-display">Maryam Naveed</h1>
@@ -112,7 +124,7 @@ function LoginForm() {
         </p>
       </div>
 
-      <div className="relative bg-surface/95 backdrop-blur-xl border border-white/15 rounded-3xl p-8 shadow-2xl shadow-black/40">
+      <div className="relative bg-surface/95 backdrop-blur-xl border border-white/15 rounded-3xl p-8 shadow-2xl shadow-black/50">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-1 rounded-full bg-gradient-to-r from-pink-400 to-gold" />
         <form onSubmit={handleLogin}>
           <p className="text-sm text-inksoft mb-5">
@@ -124,7 +136,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-4"
+            className="w-full border border-borderpink rounded-lg px-3 py-2.5 text-sm mb-4 bg-bg focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition-shadow"
           />
           <label className="block text-xs font-semibold mb-1.5">Password</label>
           <input
@@ -132,10 +144,10 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-4"
+            className="w-full border border-borderpink rounded-lg px-3 py-2.5 text-sm mb-4 bg-bg focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition-shadow"
           />
           {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
-          <button className="w-full py-2.5 rounded-full text-white text-sm font-semibold bg-gradient-to-br from-pink-400 to-pink-600 shadow-md">
+          <button className="w-full py-2.5 rounded-full text-white text-sm font-semibold bg-gradient-to-br from-pink-400 to-pink-600 shadow-md shadow-pink-500/30 hover:shadow-lg hover:shadow-pink-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
             Sign in
           </button>
         </form>
@@ -144,10 +156,14 @@ function LoginForm() {
   );
 }
 
+type AdminTab = 'upload' | 'manage' | 'messages' | 'settings' | 'reviews' | 'resume' | 'chat';
+
 function AdminPanel() {
-  const [tab, setTab] = useState<'upload' | 'manage' | 'messages' | 'settings' | 'reviews'>('messages');
+  const [tab, setTab] = useState<AdminTab>('messages');
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadReviews, setUnreadReviews] = useState(0);
+  const [pendingResume, setPendingResume] = useState(0);
+  const [unreadChats, setUnreadChats] = useState(0);
 
   useEffect(() => {
     supabase
@@ -160,65 +176,99 @@ function AdminPanel() {
       .select('*', { count: 'exact', head: true })
       .eq('is_read', false)
       .then(({ count }) => setUnreadReviews(count ?? 0));
+    supabase
+      .from('resume_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
+      .then(({ count }) => setPendingResume(count ?? 0));
+    supabase
+      .from('chat_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('sender', 'user')
+      .eq('is_read', false)
+      .then(({ count }) => setUnreadChats(count ?? 0));
   }, [tab]);
+
+  const tabIcons: Record<AdminTab, string> = {
+    messages: '💬',
+    reviews: '⭐',
+    chat: '🗨️',
+    resume: '📄',
+    upload: '⬆️',
+    manage: '🗂️',
+    settings: '⚙️'
+  };
+
+  const badgeCounts: Partial<Record<AdminTab, number>> = {
+    messages: unreadCount,
+    reviews: unreadReviews,
+    resume: pendingResume,
+    chat: unreadChats
+  };
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div className="flex gap-2 bg-pink-50 p-1 rounded-full overflow-x-auto max-w-full">
-          {(['messages', 'reviews', 'upload', 'manage', 'settings'] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`relative text-sm font-semibold px-4 py-2 rounded-full capitalize transition-colors whitespace-nowrap flex-shrink-0 ${
-                tab === t ? 'bg-white shadow text-pink-600' : 'text-inksoft'
-              }`}
-            >
-              {t}
-              {t === 'messages' && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-              {t === 'reviews' && unreadReviews > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full">
-                  {unreadReviews}
-                </span>
-              )}
-            </button>
-          ))}
+      <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-wrap justify-start gap-1.5 bg-pink-50 p-1.5 rounded-2xl sm:rounded-full w-full sm:w-auto">
+          {(['messages', 'reviews', 'chat', 'resume', 'upload', 'manage', 'settings'] as const).map(
+            (t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`relative flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full capitalize whitespace-nowrap flex-shrink-0 transition-all duration-300 ${
+                  tab === t
+                    ? 'bg-white shadow-md text-pink-600 scale-[1.03]'
+                    : 'text-inksoft hover:bg-white/60'
+                }`}
+              >
+                <span aria-hidden="true">{tabIcons[t]}</span>
+                {t}
+                {(badgeCounts[t] ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full ring-2 ring-white">
+                    {badgeCounts[t]}
+                  </span>
+                )}
+              </button>
+            )
+          )}
         </div>
         <button
           onClick={() => supabase.auth.signOut()}
-          className="text-xs font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 self-start sm:self-auto"
+          className="text-xs font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 hover:border-pink-300 transition-colors self-start"
         >
           Sign out
         </button>
       </div>
 
-      {tab === 'messages' && <AdminMessages />}
+      <div key={tab} className="animate-fadeUp">
+        {tab === 'messages' && <AdminMessages />}
 
-      {tab === 'reviews' && <AdminReviews />}
+        {tab === 'reviews' && <AdminReviews />}
 
-      {tab === 'upload' && (
-        <div className="space-y-10">
-          <ArtUploadForm category="art" title="Upload new art" />
-          <ArtUploadForm category="calligraphy" title="Upload new calligraphy" />
-          <BookUploadForm />
-          <BlogUploadForm />
-        </div>
-      )}
+        {tab === 'chat' && <AdminChat />}
 
-      {tab === 'manage' && (
-        <div className="space-y-8">
-          <AdminManageArts category="art" title="Manage art" />
-          <AdminManageArts category="calligraphy" title="Manage calligraphy" />
-          <AdminManageBooks />
-          <AdminManageBlogs />
-        </div>
-      )}
+        {tab === 'resume' && <AdminResumeRequests />}
 
-      {tab === 'settings' && <AdminSettings />}
+        {tab === 'upload' && (
+          <div className="grid gap-6 sm:grid-cols-2 items-start">
+            <ArtUploadForm category="art" title="Upload new art" />
+            <ArtUploadForm category="calligraphy" title="Upload new calligraphy" />
+            <BookUploadForm />
+            <BlogUploadForm />
+          </div>
+        )}
+
+        {tab === 'manage' && (
+          <div className="space-y-8">
+            <AdminManageArts category="art" title="Manage art" />
+            <AdminManageArts category="calligraphy" title="Manage calligraphy" />
+            <AdminManageBooks />
+            <AdminManageBlogs />
+          </div>
+        )}
+
+        {tab === 'settings' && <AdminSettings />}
+      </div>
     </div>
   );
 }
@@ -290,7 +340,7 @@ function ArtUploadForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface border border-borderpink rounded-card p-6 card-shadow"
+      className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
     >
       <h3 className="text-lg mb-4">{title}</h3>
       <input
@@ -427,7 +477,7 @@ function BookUploadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface border border-borderpink rounded-card p-6 card-shadow"
+      className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
     >
       <h3 className="text-lg mb-4">Upload new book</h3>
       <input
@@ -540,7 +590,7 @@ function BlogUploadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface border border-borderpink rounded-card p-6 card-shadow"
+      className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
     >
       <h3 className="text-lg mb-4">Write a new blog post</h3>
       <input

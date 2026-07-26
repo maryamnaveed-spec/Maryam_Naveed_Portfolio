@@ -68,11 +68,11 @@ export default function AboutSection({ profileImage }: { profileImage?: string |
         </div>
 
         <Reveal delay={400}>
-          <div className="relative glass-card border border-borderpink rounded-2xl p-7 sm:p-9 card-shadow bg-gradient-to-br from-ink to-[#5A2E4A] overflow-hidden text-center">
-            <span className="pointer-events-none absolute -left-4 -top-6 text-8xl text-white/5 select-none">
+          <div className="relative glass-card border border-borderpink rounded-2xl p-7 sm:p-9 card-shadow overflow-hidden text-center">
+            <span className="pointer-events-none absolute -left-4 -top-6 text-8xl text-pink-400/10 select-none">
               &ldquo;
             </span>
-            <p className="quote text-2xl sm:text-3xl text-goldlight leading-snug relative">
+            <p className="quote text-2xl sm:text-3xl text-ink leading-snug relative">
               Every book tells a story. Every artwork expresses an emotion.
               Every mind holds a unique perspective&mdash;and I believe each
               deserves to be understood.

@@ -83,15 +83,15 @@ export default function HighlightsSection({
       </div>
 
       {/* Quote of the Day */}
-      <div className="group relative glass-card border border-borderpink rounded-2xl p-6 card-shadow flex flex-col justify-center transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-pink-400/60 bg-gradient-to-br from-ink to-[#5A2E4A] overflow-hidden">
+      <div className="group relative glass-card border border-borderpink rounded-2xl p-6 card-shadow flex flex-col justify-center transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-pink-400/60 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-400 via-gold to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <span className="pointer-events-none absolute -right-4 -bottom-6 text-8xl text-white/5 select-none quote-mark">
+        <span className="pointer-events-none absolute -right-4 -bottom-6 text-8xl text-pink-400/10 select-none quote-mark">
           &rdquo;
         </span>
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-goldlight/90 bg-white/10 px-2.5 py-1 rounded-full w-fit mb-4 relative">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-pink-600 bg-pink-50 px-2.5 py-1 rounded-full w-fit mb-4 relative">
           Quote of the Day
         </span>
-        <p className="quote text-2xl text-goldlight leading-snug relative">&ldquo;{quote}&rdquo;</p>
+        <p className="quote text-2xl text-ink leading-snug relative">&ldquo;{quote}&rdquo;</p>
       </div>
 
       <style jsx global>{`

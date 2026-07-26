@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import FeedbackButton from './FeedbackButton';
+import ResumeRequestButton from './ResumeRequestButton';
 import {
   ART_SUBCATEGORIES,
   CALLIGRAPHY_SUBCATEGORIES,
@@ -155,6 +156,7 @@ export default function Header() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
+          <ResumeRequestButton />
           <Link
             href="/admin"
             className="text-sm font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 transition-colors"
@@ -225,6 +227,9 @@ export default function Header() {
           >
             Owner
           </Link>
+          <div className="pt-3">
+            <ResumeRequestButton className="w-full block text-center text-sm font-semibold px-4 py-2 rounded-full border transition-colors" />
+          </div>
           <div className="flex gap-3 pt-3">
             <Link
               href="/admin"

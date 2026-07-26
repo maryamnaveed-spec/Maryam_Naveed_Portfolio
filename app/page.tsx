@@ -6,8 +6,13 @@ import HomeSections from '@/components/HomeSections';
 import Reveal from '@/components/Reveal';
 import { supabase, ArtItem, BookItem, BlogItem } from '@/lib/supabase';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// Serve the homepage instantly from cache and refresh it quietly every
+// 30 seconds in the background, instead of blocking every single visit on
+// a fresh round-trip to Supabase (that's what was making navigation feel slow).
+export const revalidate = 30;
+
+const FALLBACK_QUOTE =
+  'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.';
 
 async function getArts(category: 'art' | 'calligraphy'): Promise<ArtItem[]> {
   const { data } = await supabase
@@ -34,61 +39,39 @@ async function getBlogs(): Promise<BlogItem[]> {
   return data ?? [];
 }
 
-async function getBackgroundImage(): Promise<string | null> {
+// One single request for all 3 settings fields instead of 3 separate
+// round-trips to the same row — cuts homepage load latency further.
+async function getSiteSettings(): Promise<{
+  backgroundImage: string | null;
+  quoteOfDay: string;
+  profileImage: string | null;
+}> {
   const { data, error } = await supabase
     .from('settings')
-    .select('background_image_url')
+    .select('background_image_url, quote_of_day, profile_image_url')
     .eq('id', 1)
     .single();
 
   if (error) {
-    console.error('Failed to fetch background_image_url from settings table:', error.message);
+    console.error('Failed to fetch settings row:', error.message);
   }
 
-  return data?.background_image_url ?? null;
-}
-
-async function getQuoteOfDay(): Promise<string> {
-  const fallback =
-    'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.';
-
-  const { data, error } = await supabase
-    .from('settings')
-    .select('quote_of_day')
-    .eq('id', 1)
-    .single();
-
-  if (error) {
-    console.error('Failed to fetch quote_of_day from settings table:', error.message);
-  }
-
-  return data?.quote_of_day || fallback;
-}
-
-async function getProfileImage(): Promise<string | null> {
-  const { data, error } = await supabase
-    .from('settings')
-    .select('profile_image_url')
-    .eq('id', 1)
-    .single();
-
-  if (error) {
-    console.error('Failed to fetch profile_image_url from settings table:', error.message);
-  }
-
-  return data?.profile_image_url ?? null;
+  return {
+    backgroundImage: data?.background_image_url ?? null,
+    quoteOfDay: data?.quote_of_day || FALLBACK_QUOTE,
+    profileImage: data?.profile_image_url ?? null
+  };
 }
 
 export default async function HomePage() {
-  const [artItems, calligraphyItems, books, blogs, backgroundImage, quoteOfDay, profileImage] = await Promise.all([
+  const [artItems, calligraphyItems, books, blogs, settings] = await Promise.all([
     getArts('art'),
     getArts('calligraphy'),
     getBooks(),
     getBlogs(),
-    getBackgroundImage(),
-    getQuoteOfDay(),
-    getProfileImage()
+    getSiteSettings()
   ]);
+  const { backgroundImage, quoteOfDay, profileImage } = settings;
 
   return (
     <main>

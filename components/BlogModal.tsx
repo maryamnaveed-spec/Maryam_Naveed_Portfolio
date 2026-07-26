@@ -23,12 +23,15 @@ export default function BlogModal({
           onClick={(e) => e.stopPropagation()}
         >
           {blog.cover_image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={blog.cover_image_url}
-              alt={blog.title}
-              className="w-full h-56 object-cover"
-            loading="lazy" />
+            <div className="w-full max-h-[40vh] bg-pink-50 flex items-center justify-center overflow-hidden rounded-t-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={blog.cover_image_url}
+                alt={blog.title}
+                className="w-full max-h-[40vh] object-contain"
+                loading="lazy"
+              />
+            </div>
           )}
           <div className="p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4 mb-2">
