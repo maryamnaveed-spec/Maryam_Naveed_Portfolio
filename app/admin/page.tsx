@@ -7,6 +7,7 @@ import type { Session } from '@supabase/supabase-js';
 import AdminMessages from '@/components/admin/AdminMessages';
 import AdminManageArts from '@/components/admin/AdminManageArts';
 import AdminManageBooks from '@/components/admin/AdminManageBooks';
+import AdminManageAudioBooks from '@/components/admin/AdminManageAudioBooks';
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminManageBlogs from '@/components/admin/AdminManageBlogs';
 import AdminReviews from '@/components/admin/AdminReviews';
@@ -254,6 +255,7 @@ function AdminPanel() {
             <ArtUploadForm category="art" title="Upload new art" />
             <ArtUploadForm category="calligraphy" title="Upload new calligraphy" />
             <BookUploadForm />
+            <AudioBookUploadForm />
             <BlogUploadForm />
           </div>
         )}
@@ -263,6 +265,7 @@ function AdminPanel() {
             <AdminManageArts category="art" title="Manage art" />
             <AdminManageArts category="calligraphy" title="Manage calligraphy" />
             <AdminManageBooks />
+            <AdminManageAudioBooks />
             <AdminManageBlogs />
           </div>
         )}
@@ -543,6 +546,109 @@ function BookUploadForm() {
       <br />
       <button className="mt-1 text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
         Upload book
+      </button>
+      {status && <p className="text-xs text-inksoft mt-3">{status}</p>}
+    </form>
+  );
+}
+
+function AudioBookUploadForm() {
+  const [form, setForm] = useState({ title: '', author: '' });
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [status, setStatus] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!audioFile) return setStatus('Please choose an MP3 file.');
+    if (!coverFile) return setStatus('Please choose a cover image.');
+
+    if (audioFile.size > 50 * 1024 * 1024) {
+      return setStatus(
+        'This MP3 is larger than 50MB. Supabase free tier has a 50MB upload limit per file - please compress it or upgrade your plan.'
+      );
+    }
+
+    try {
+      setStatus('Uploading cover image...');
+      const coverPath = `${Date.now()}-${coverFile.name}`;
+      const { error: coverError } = await supabase.storage
+        .from('audiobook-covers')
+        .upload(coverPath, coverFile);
+      if (coverError) throw new Error(`Cover upload failed: ${coverError.message}`);
+      const coverUrl = supabase.storage.from('audiobook-covers').getPublicUrl(coverPath).data
+        .publicUrl;
+
+      setStatus('Uploading MP3... this can take a minute for large files.');
+      const audioPath = `${Date.now()}-${audioFile.name}`;
+      const { error: audioError } = await supabase.storage
+        .from('audiobook-files')
+        .upload(audioPath, audioFile);
+      if (audioError) throw new Error(`MP3 upload failed: ${audioError.message}`);
+      const audioUrl = supabase.storage.from('audiobook-files').getPublicUrl(audioPath).data
+        .publicUrl;
+
+      setStatus('Saving audiobook details...');
+      const { error: insertError } = await supabase.from('audio_books').insert({
+        title: form.title,
+        author: form.author || null,
+        cover_image_url: coverUrl,
+        audio_url: audioUrl
+      });
+      if (insertError) throw new Error(`Saving audiobook failed: ${insertError.message}`);
+    } catch (err: any) {
+      setStatus(err.message || 'Something went wrong. Please try again.');
+      return;
+    }
+
+    setStatus('Audiobook uploaded successfully. Check the Audio Books page to see it.');
+    setForm({ title: '', author: '' });
+    setAudioFile(null);
+    setCoverFile(null);
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+    >
+      <h3 className="text-lg mb-4">Upload new audiobook</h3>
+      <input
+        type="text"
+        placeholder="Book title"
+        value={form.title}
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        required
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      />
+      <input
+        type="text"
+        placeholder="Author (optional)"
+        value={form.author}
+        onChange={(e) => setForm({ ...form, author: e.target.value })}
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      />
+
+      <label className="block text-xs font-semibold mb-1.5">Cover image</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+        required
+        className="text-sm mb-3"
+      />
+      <br />
+      <label className="block text-xs font-semibold mb-1.5">MP3 file</label>
+      <input
+        type="file"
+        accept="audio/mpeg,audio/mp3,.mp3"
+        onChange={(e) => setAudioFile(e.target.files?.[0] ?? null)}
+        required
+        className="text-sm mb-3"
+      />
+      <br />
+      <button className="mt-1 text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
+        Upload audiobook
       </button>
       {status && <p className="text-xs text-inksoft mt-3">{status}</p>}
     </form>

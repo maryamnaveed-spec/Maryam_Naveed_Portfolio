@@ -231,6 +231,32 @@ drop policy if exists "Authenticated can delete chat messages" on chat_messages;
 create policy "Authenticated can delete chat messages"
   on chat_messages for delete to authenticated using (true);
 
+-- ============ 10. AUDIO BOOKS table ============
+create table if not exists audio_books (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  author text,
+  cover_image_url text not null,
+  audio_url text not null,
+  created_at timestamp with time zone default now()
+);
+alter table audio_books enable row level security;
+
+drop policy if exists "Public can view audio books" on audio_books;
+create policy "Public can view audio books" on audio_books for select using (true);
+
+drop policy if exists "Authenticated can insert audio books" on audio_books;
+create policy "Authenticated can insert audio books"
+  on audio_books for insert to authenticated with check (true);
+
+drop policy if exists "Authenticated can update audio books" on audio_books;
+create policy "Authenticated can update audio books"
+  on audio_books for update to authenticated using (true);
+
+drop policy if exists "Authenticated can delete audio books" on audio_books;
+create policy "Authenticated can delete audio books"
+  on audio_books for delete to authenticated using (true);
+
 -- Storage bucket for before/after GIFs
 insert into storage.buckets (id, name, public) values ('art-before-after', 'art-before-after', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('site-backgrounds', 'site-backgrounds', true) on conflict (id) do nothing;
@@ -263,6 +289,20 @@ insert into storage.buckets (id, name, public) values ('book-pdfs', 'book-pdfs',
 insert into storage.buckets (id, name, public) values ('book-covers', 'book-covers', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('blog-covers', 'blog-covers', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('resume-files', 'resume-files', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('audiobook-covers', 'audiobook-covers', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('audiobook-files', 'audiobook-files', true) on conflict (id) do nothing;
+
+drop policy if exists "Public read audiobook-covers" on storage.objects;
+create policy "Public read audiobook-covers" on storage.objects for select using (bucket_id = 'audiobook-covers');
+drop policy if exists "Authenticated upload audiobook-covers" on storage.objects;
+create policy "Authenticated upload audiobook-covers"
+  on storage.objects for insert to authenticated with check (bucket_id = 'audiobook-covers');
+
+drop policy if exists "Public read audiobook-files" on storage.objects;
+create policy "Public read audiobook-files" on storage.objects for select using (bucket_id = 'audiobook-files');
+drop policy if exists "Authenticated upload audiobook-files" on storage.objects;
+create policy "Authenticated upload audiobook-files"
+  on storage.objects for insert to authenticated with check (bucket_id = 'audiobook-files');
 
 drop policy if exists "Public read resume-files" on storage.objects;
 create policy "Public read resume-files" on storage.objects for select using (bucket_id = 'resume-files');

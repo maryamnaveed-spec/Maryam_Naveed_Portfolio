@@ -62,6 +62,51 @@ function NavDropdown({
   );
 }
 
+function BooksNavDropdown({ onBooks, onAudioBooks }: { onBooks: () => void; onAudioBooks: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        onClick={onBooks}
+        className="flex items-center gap-1 hover:text-pink-600 transition-colors"
+      >
+        My Books
+        <span className="text-[10px] mt-0.5">▾</span>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 pt-3 z-40">
+          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-44 glass-card">
+            <button
+              onClick={() => {
+                onBooks();
+                setOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
+            >
+              📚 Books
+            </button>
+            <button
+              onClick={() => {
+                onAudioBooks();
+                setOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
+            >
+              🎧 Audio Books
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,12 +180,10 @@ export default function Header() {
             onSelect={setCalligraphyFilter}
             onNavigate={() => goToSection('calligraphy')}
           />
-          <button
-            onClick={() => goToSection('books')}
-            className="hover:text-pink-600 transition-colors"
-          >
-            My Books
-          </button>
+          <BooksNavDropdown
+            onBooks={() => goToSection('books')}
+            onAudioBooks={() => router.push('/audiobooks')}
+          />
           <button
             onClick={() => goToSection('blog')}
             className="hover:text-pink-600 transition-colors"
@@ -202,8 +245,15 @@ export default function Header() {
             }}
             className="text-left py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
           >
-            My Books
+            📚 My Books
           </button>
+          <Link
+            href="/audiobooks"
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
+          >
+            🎧 Audio Books
+          </Link>
           <button
             onClick={() => {
               goToSection('blog');

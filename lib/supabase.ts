@@ -86,6 +86,21 @@ export type ChatMessageItem = {
   created_at: string;
 };
 
-export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait'];
-export const CALLIGRAPHY_SUBCATEGORIES = ['All Names', 'Quranic Verses', 'English', 'Names'];
+export type AudioBookItem = {
+  id: string;
+  title: string;
+  author: string | null;
+  cover_image_url: string;
+  audio_url: string;
+  created_at: string;
+};
+
+export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait', 'Digital Art'];
+export const CALLIGRAPHY_SUBCATEGORIES = [
+  'All Names',
+  'Quranic Verses',
+  'English',
+  'Names',
+  'Digital Calligraphy'
+];
 export const BLOG_CATEGORIES = ['Psychology', 'Librarian', 'Islamic', 'Aqwal', 'Motivational'];
