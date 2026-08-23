@@ -2,7 +2,7 @@ import Header from '@/components/Header';
 import AudioBookGrid from '@/components/AudioBookGrid';
 import { supabase, AudioBookItem } from '@/lib/supabase';
 
-export const revalidate = 30;
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Audio Books — Maryam Naveed'
@@ -11,7 +11,7 @@ export const metadata = {
 async function getAudioBooks(): Promise<AudioBookItem[]> {
   const { data } = await supabase
     .from('audio_books')
-    .select('*')
+    .select('id, title, author, cover_image_url, audio_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }

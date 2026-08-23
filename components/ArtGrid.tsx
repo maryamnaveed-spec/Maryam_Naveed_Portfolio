@@ -29,6 +29,7 @@ export default function ArtGrid({
         {items.map((item) => (
           <div
             key={item.id}
+            data-search-id={item.id}
             onClick={() => setSelected(item)}
             className="group glass-card rounded-card overflow-hidden card-shadow cursor-pointer border border-borderpink transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-pink-400/50 hover:shadow-pink-400/15"
           >
@@ -37,6 +38,7 @@ export default function ArtGrid({
                 src={item.image_url}
                 alt={item.title}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {item.before_after_gif_url && (

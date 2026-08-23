@@ -6,7 +6,7 @@ import LibrarySection from './LibrarySection';
 import BlogSection from './BlogSection';
 import FeaturedCarousel from './FeaturedCarousel';
 import AnimatedCounters from './AnimatedCounters';
-import HighlightsSection from './HighlightsSection';
+import SiteSearch from './SiteSearch';
 import Reveal from './Reveal';
 import { useFilters } from './FiltersProvider';
 import { ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES } from '@/lib/supabase';
@@ -15,20 +15,15 @@ export default function HomeSections({
   artItems,
   calligraphyItems,
   books,
-  blogs,
-  quoteOfDay
+  blogs
 }: {
   artItems: ArtItem[];
   calligraphyItems: ArtItem[];
   books: BookItem[];
   blogs: BlogItem[];
-  quoteOfDay: string;
 }) {
   const { artFilter, setArtFilter, calligraphyFilter, setCalligraphyFilter } = useFilters();
   const featured = [...artItems, ...calligraphyItems].slice(0, 6);
-  const featuredArt = featured[0] ?? null;
-  const featuredBook =
-    [...books].sort((a, b) => b.rating - a.rating)[0] ?? null;
 
   const artworkCount = artItems.length + calligraphyItems.length;
   const bookCount = books.length;
@@ -61,13 +56,22 @@ export default function HomeSections({
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-10 sm:py-14">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <Reveal>
-            <HighlightsSection
-              featuredArt={featuredArt}
-              featuredBook={featuredBook}
-              quote={quoteOfDay}
+            <div className="text-center mb-6 sm:mb-8">
+              <span className="inline-block text-[11px] font-semibold tracking-wide uppercase text-pink-600 bg-pink-50 px-4 py-1.5 rounded-full mb-3">
+                Find something beautiful
+              </span>
+              <h2 className="text-2xl sm:text-3xl">What are you looking for?</h2>
+            </div>
+            <SiteSearch
+              artItems={artItems}
+              calligraphyItems={calligraphyItems}
+              books={books}
+              blogs={blogs}
+              onNeedsArtFilterReset={() => setArtFilter('All')}
+              onNeedsCalligraphyFilterReset={() => setCalligraphyFilter('All')}
             />
           </Reveal>
         </div>

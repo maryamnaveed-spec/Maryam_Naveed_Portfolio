@@ -45,7 +45,7 @@ export default function AboutSection({ profileImage }: { profileImage?: string |
             </span>
             <h2 className="text-3xl sm:text-4xl">A little more about me</h2>
             <p className="text-inksoft text-sm sm:text-base mt-2 max-w-xl mx-auto">
-              I am a librarian, painter, and calligraphy enthusiast with a
+              I am a librarian, and calligraphy enthusiast with a
               deep appreciation for knowledge, creativity, and human
               understanding.
             </p>

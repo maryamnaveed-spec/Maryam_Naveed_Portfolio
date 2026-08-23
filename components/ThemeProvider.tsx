@@ -2,7 +2,31 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type ThemeName = 'pink' | 'lavender' | 'mint' | 'peach';
+export type ThemeName =
+  | 'pink'
+  | 'lavender'
+  | 'mint'
+  | 'peach'
+  | 'rose'
+  | 'coral'
+  | 'amber'
+  | 'gold'
+  | 'olive'
+  | 'lime'
+  | 'emerald'
+  | 'teal'
+  | 'cyan'
+  | 'sky'
+  | 'azure'
+  | 'sapphire'
+  | 'indigo'
+  | 'violet'
+  | 'plum'
+  | 'magenta'
+  | 'fuchsia'
+  | 'crimson'
+  | 'terracotta'
+  | 'slate';
 
 type ThemeContextValue = {
   theme: ThemeName;

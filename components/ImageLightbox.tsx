@@ -29,6 +29,7 @@ export default function ImageLightbox({
             src={item.image_url}
             alt={item.title}
             fill
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-contain"
           />
           <button

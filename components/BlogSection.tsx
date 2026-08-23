@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { BlogItem, BLOG_CATEGORIES } from '@/lib/supabase';
 import BlogModal from './BlogModal';
 
@@ -44,17 +45,18 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
           {visible.map((blog) => (
             <div
               key={blog.id}
+              data-search-id={blog.id}
               onClick={() => setActive(blog)}
               className="glass-card rounded-card overflow-hidden card-shadow cursor-pointer border border-borderpink transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
             >
               {blog.cover_image_url ? (
-                <div className="w-full aspect-[4/3] bg-pink-50 flex items-center justify-center overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative w-full aspect-[4/3] bg-pink-50 flex items-center justify-center overflow-hidden">
+                  <Image
                     src={blog.cover_image_url}
                     alt={blog.title}
-                    className="w-full h-full object-contain"
-                    loading="lazy"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-contain"
                   />
                 </div>
               ) : (

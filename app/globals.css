@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:ital,wght@0,600;1,600&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+/* Fonts are now loaded via next/font in app/layout.tsx (self-hosted,
+   no external Google Fonts round-trip) — see the --font-* variables
+   referenced below. */
 
 /* ===== Default theme: Baby Pink ===== */
 :root {
@@ -68,6 +70,326 @@
   --borderpink: 249 217 195;
 }
 
+/* ===== Rose theme ===== */
+[data-theme='rose'] {
+  --bg: 251 244 245;
+  --surface: 255 255 255;
+  --pink-50: 248 231 234;
+  --pink-100: 238 205 211;
+  --pink-300: 228 149 162;
+  --pink-400: 221 95 116;
+  --pink-600: 178 56 77;
+  --ink: 56 30 35;
+  --inksoft: 120 84 90;
+  --gold: 201 154 68;
+  --goldlight: 235 219 203;
+  --borderpink: 240 219 222;
+}
+
+/* ===== Coral theme ===== */
+[data-theme='coral'] {
+  --bg: 251 245 244;
+  --surface: 255 255 255;
+  --pink-50: 248 234 231;
+  --pink-100: 238 210 205;
+  --pink-300: 228 160 149;
+  --pink-400: 221 112 95;
+  --pink-600: 178 73 56;
+  --ink: 56 34 30;
+  --inksoft: 120 89 84;
+  --gold: 201 154 68;
+  --goldlight: 235 229 203;
+  --borderpink: 240 222 219;
+}
+
+/* ===== Amber theme ===== */
+[data-theme='amber'] {
+  --bg: 251 248 244;
+  --surface: 255 255 255;
+  --pink-50: 248 242 231;
+  --pink-100: 238 226 205;
+  --pink-300: 228 199 149;
+  --pink-400: 221 175 95;
+  --pink-600: 178 134 56;
+  --ink: 56 47 30;
+  --inksoft: 120 107 84;
+  --gold: 201 154 68;
+  --goldlight: 226 235 203;
+  --borderpink: 240 232 219;
+}
+
+/* ===== Gold theme ===== */
+[data-theme='gold'] {
+  --bg: 251 249 244;
+  --surface: 255 255 255;
+  --pink-50: 248 244 231;
+  --pink-100: 238 230 205;
+  --pink-300: 228 209 149;
+  --pink-400: 221 190 95;
+  --pink-600: 178 148 56;
+  --ink: 56 50 30;
+  --inksoft: 120 111 84;
+  --gold: 201 154 68;
+  --goldlight: 222 235 203;
+  --borderpink: 240 235 219;
+}
+
+/* ===== Olive theme ===== */
+[data-theme='olive'] {
+  --bg: 250 251 244;
+  --surface: 255 255 255;
+  --pink-50: 246 248 231;
+  --pink-100: 234 238 205;
+  --pink-300: 218 228 149;
+  --pink-400: 204 221 95;
+  --pink-600: 162 178 56;
+  --ink: 53 56 30;
+  --inksoft: 115 120 84;
+  --gold: 201 154 68;
+  --goldlight: 210 235 203;
+  --borderpink: 237 240 219;
+}
+
+/* ===== Lime theme ===== */
+[data-theme='lime'] {
+  --bg: 248 251 244;
+  --surface: 255 255 255;
+  --pink-50: 240 248 231;
+  --pink-100: 223 238 205;
+  --pink-300: 191 228 149;
+  --pink-400: 162 221 95;
+  --pink-600: 121 178 56;
+  --ink: 44 56 30;
+  --inksoft: 103 120 84;
+  --gold: 201 154 68;
+  --goldlight: 203 235 208;
+  --borderpink: 230 240 219;
+}
+
+/* ===== Emerald theme ===== */
+[data-theme='emerald'] {
+  --bg: 244 251 248;
+  --surface: 255 255 255;
+  --pink-50: 231 248 240;
+  --pink-100: 205 238 223;
+  --pink-300: 149 228 191;
+  --pink-400: 95 221 162;
+  --pink-600: 56 178 121;
+  --ink: 30 56 44;
+  --inksoft: 84 120 103;
+  --gold: 201 154 68;
+  --goldlight: 203 229 235;
+  --borderpink: 219 240 230;
+}
+
+/* ===== Teal theme ===== */
+[data-theme='teal'] {
+  --bg: 244 251 250;
+  --surface: 255 255 255;
+  --pink-50: 231 248 247;
+  --pink-100: 205 238 236;
+  --pink-300: 149 228 222;
+  --pink-400: 95 221 211;
+  --pink-600: 56 178 168;
+  --ink: 30 56 54;
+  --inksoft: 84 120 117;
+  --gold: 201 154 68;
+  --goldlight: 203 217 235;
+  --borderpink: 219 240 238;
+}
+
+/* ===== Cyan theme ===== */
+[data-theme='cyan'] {
+  --bg: 244 250 251;
+  --surface: 255 255 255;
+  --pink-50: 231 245 248;
+  --pink-100: 205 233 238;
+  --pink-300: 149 215 228;
+  --pink-400: 95 200 221;
+  --pink-600: 56 158 178;
+  --ink: 30 52 56;
+  --inksoft: 84 114 120;
+  --gold: 201 154 68;
+  --goldlight: 203 209 235;
+  --borderpink: 219 237 240;
+}
+
+/* ===== Sky theme ===== */
+[data-theme='sky'] {
+  --bg: 244 248 251;
+  --surface: 255 255 255;
+  --pink-50: 231 243 248;
+  --pink-100: 205 227 238;
+  --pink-300: 149 202 228;
+  --pink-400: 95 179 221;
+  --pink-600: 56 138 178;
+  --ink: 30 48 56;
+  --inksoft: 84 108 120;
+  --gold: 201 154 68;
+  --goldlight: 203 203 235;
+  --borderpink: 219 233 240;
+}
+
+/* ===== Azure theme ===== */
+[data-theme='azure'] {
+  --bg: 244 247 251;
+  --surface: 255 255 255;
+  --pink-50: 231 240 248;
+  --pink-100: 205 222 238;
+  --pink-300: 149 189 228;
+  --pink-400: 95 158 221;
+  --pink-600: 56 117 178;
+  --ink: 30 43 56;
+  --inksoft: 84 102 120;
+  --gold: 201 154 68;
+  --goldlight: 209 203 235;
+  --borderpink: 219 230 240;
+}
+
+/* ===== Sapphire theme ===== */
+[data-theme='sapphire'] {
+  --bg: 244 246 251;
+  --surface: 255 255 255;
+  --pink-50: 231 236 248;
+  --pink-100: 205 215 238;
+  --pink-300: 149 173 228;
+  --pink-400: 95 133 221;
+  --pink-600: 56 93 178;
+  --ink: 30 38 56;
+  --inksoft: 84 95 120;
+  --gold: 201 154 68;
+  --goldlight: 215 203 235;
+  --borderpink: 219 225 240;
+}
+
+/* ===== Indigo theme ===== */
+[data-theme='indigo'] {
+  --bg: 244 244 251;
+  --surface: 255 255 255;
+  --pink-50: 232 231 248;
+  --pink-100: 207 205 238;
+  --pink-300: 153 149 228;
+  --pink-400: 101 95 221;
+  --pink-600: 62 56 178;
+  --ink: 32 30 56;
+  --inksoft: 85 84 120;
+  --gold: 201 154 68;
+  --goldlight: 226 203 235;
+  --borderpink: 220 219 240;
+}
+
+/* ===== Violet theme ===== */
+[data-theme='violet'] {
+  --bg: 247 244 251;
+  --surface: 255 255 255;
+  --pink-50: 238 231 248;
+  --pink-100: 219 205 238;
+  --pink-300: 182 149 228;
+  --pink-400: 148 95 221;
+  --pink-600: 107 56 178;
+  --ink: 41 30 56;
+  --inksoft: 99 84 120;
+  --gold: 201 154 68;
+  --goldlight: 235 203 233;
+  --borderpink: 228 219 240;
+}
+
+/* ===== Plum theme ===== */
+[data-theme='plum'] {
+  --bg: 249 244 251;
+  --surface: 255 255 255;
+  --pink-50: 244 231 248;
+  --pink-100: 230 205 238;
+  --pink-300: 209 149 228;
+  --pink-400: 190 95 221;
+  --pink-600: 148 56 178;
+  --ink: 50 30 56;
+  --inksoft: 111 84 120;
+  --gold: 201 154 68;
+  --goldlight: 235 203 222;
+  --borderpink: 235 219 240;
+}
+
+/* ===== Magenta theme ===== */
+[data-theme='magenta'] {
+  --bg: 251 244 250;
+  --surface: 255 255 255;
+  --pink-50: 248 231 247;
+  --pink-100: 238 205 236;
+  --pink-300: 228 149 222;
+  --pink-400: 221 95 211;
+  --pink-600: 178 56 168;
+  --ink: 56 30 54;
+  --inksoft: 120 84 117;
+  --gold: 201 154 68;
+  --goldlight: 235 203 211;
+  --borderpink: 240 219 238;
+}
+
+/* ===== Fuchsia theme ===== */
+[data-theme='fuchsia'] {
+  --bg: 251 244 248;
+  --surface: 255 255 255;
+  --pink-50: 248 231 243;
+  --pink-100: 238 205 227;
+  --pink-300: 228 149 202;
+  --pink-400: 221 95 179;
+  --pink-600: 178 56 138;
+  --ink: 56 30 48;
+  --inksoft: 120 84 108;
+  --gold: 201 154 68;
+  --goldlight: 235 203 203;
+  --borderpink: 240 219 233;
+}
+
+/* ===== Crimson theme ===== */
+[data-theme='crimson'] {
+  --bg: 251 244 246;
+  --surface: 255 255 255;
+  --pink-50: 248 231 235;
+  --pink-100: 238 205 214;
+  --pink-300: 228 149 169;
+  --pink-400: 221 95 127;
+  --pink-600: 178 56 87;
+  --ink: 56 30 37;
+  --inksoft: 120 84 93;
+  --gold: 201 154 68;
+  --goldlight: 235 217 203;
+  --borderpink: 240 219 224;
+}
+
+/* ===== Terracotta theme ===== */
+[data-theme='terracotta'] {
+  --bg: 251 246 244;
+  --surface: 255 255 255;
+  --pink-50: 248 236 231;
+  --pink-100: 238 215 205;
+  --pink-300: 228 173 149;
+  --pink-400: 221 133 95;
+  --pink-600: 178 93 56;
+  --ink: 56 38 30;
+  --inksoft: 120 95 84;
+  --gold: 201 154 68;
+  --goldlight: 235 234 203;
+  --borderpink: 240 225 219;
+}
+
+/* ===== Slate theme ===== */
+[data-theme='slate'] {
+  --bg: 246 247 249;
+  --surface: 255 255 255;
+  --pink-50: 237 239 242;
+  --pink-100: 217 221 227;
+  --pink-300: 179 187 199;
+  --pink-400: 141 155 176;
+  --pink-600: 91 113 143;
+  --ink: 37 42 50;
+  --inksoft: 92 100 112;
+  --gold: 201 154 68;
+  --goldlight: 216 212 226;
+  --borderpink: 226 229 233;
+}
+
 /* ===== Dark mode overrides (combine with any theme above) ===== */
 .dark {
   --bg: 22 15 20;
@@ -119,19 +441,19 @@ body {
 body {
   background: rgb(var(--bg));
   color: rgb(var(--ink));
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  font-family: var(--font-cormorant), var(--font-playfair), 'Cormorant Garamond', 'Playfair Display', serif;
   letter-spacing: -0.01em;
 }
 
 .quote {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-caveat), 'Caveat', cursive;
 }
 
 .card-shadow {
@@ -190,4 +512,16 @@ button:focus-visible, a:focus-visible {
 @keyframes pageEnter {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Brief glowing ring pulse applied to whatever card the site search
+   scrolls to, so the person can immediately see which result matched. */
+.search-highlight-pulse {
+  animation: searchHighlightPulse 1.8s ease-out 2;
+  border-radius: 1rem;
+}
+@keyframes searchHighlightPulse {
+  0% { box-shadow: 0 0 0 0 rgba(217, 78, 128, 0.55); }
+  70% { box-shadow: 0 0 0 14px rgba(217, 78, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 78, 128, 0); }
 }

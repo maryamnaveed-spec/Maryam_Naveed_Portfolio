@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { AudioBookItem } from '@/lib/supabase';
 
 function formatTime(seconds: number) {
@@ -67,8 +68,13 @@ function AudioBookCard({ book }: { book: AudioBookItem }) {
       <audio ref={audioRef} src={book.audio_url} preload="metadata" onPause={() => setPlaying(false)} />
 
       <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-lg mb-4">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={book.cover_image_url} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
+        <Image
+          src={book.cover_image_url}
+          alt={book.title}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         {playing && (
           <span className="absolute top-2.5 right-2.5 flex items-center gap-1 text-[10px] font-semibold text-white bg-pink-600/90 px-2 py-1 rounded-full">

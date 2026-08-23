@@ -25,7 +25,14 @@ export default function FeaturedCarousel({ items }: { items: ArtItem[] }) {
           className="absolute inset-0 transition-opacity duration-1000"
           style={{ opacity: i === index ? 1 : 0 }}
         >
-          <Image src={item.image_url} alt={item.title} fill className="object-cover" priority={i === 0} />
+          <Image
+            src={item.image_url}
+            alt={item.title}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority={i === 0}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
             <span className="text-[10px] font-semibold uppercase tracking-wide text-white/80 bg-white/15 backdrop-blur px-3 py-1 rounded-full">

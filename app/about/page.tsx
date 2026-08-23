@@ -2,8 +2,8 @@ import Header from '@/components/Header';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
-// Instant, cached navigation instead of re-fetching on every visit.
-export const revalidate = 30;
+// Always fetch fresh data - see app/page.tsx for why.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'About Maryam Naveed'

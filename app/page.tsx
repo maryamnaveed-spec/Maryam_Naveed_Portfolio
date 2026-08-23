@@ -1,15 +1,15 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import AboutSection from '@/components/AboutSection';
 import FocusCards from '@/components/FocusCards';
 import HomeSections from '@/components/HomeSections';
 import Reveal from '@/components/Reveal';
 import { supabase, ArtItem, BookItem, BlogItem } from '@/lib/supabase';
 
-// Serve the homepage instantly from cache and refresh it quietly every
-// 30 seconds in the background, instead of blocking every single visit on
-// a fresh round-trip to Supabase (that's what was making navigation feel slow).
-export const revalidate = 30;
+// Always fetch fresh data server-side on every visit (no stale ISR/router
+// cache) so newly-added art, books, blog posts, etc. show up immediately -
+// this was previously "revalidate = 30", which could serve an empty/stale
+// snapshot until a hard refresh.
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_QUOTE =
   'Every book tells a story. Every artwork expresses an emotion. Every mind holds a unique perspective.';
@@ -17,7 +17,7 @@ const FALLBACK_QUOTE =
 async function getArts(category: 'art' | 'calligraphy'): Promise<ArtItem[]> {
   const { data } = await supabase
     .from('arts')
-    .select('*')
+    .select('id, title, category, subcategory, description, image_url, before_after_gif_url, created_at')
     .eq('category', category)
     .order('created_at', { ascending: false });
   return data ?? [];
@@ -26,7 +26,7 @@ async function getArts(category: 'art' | 'calligraphy'): Promise<ArtItem[]> {
 async function getBooks(): Promise<BookItem[]> {
   const { data } = await supabase
     .from('books')
-    .select('*')
+    .select('id, title, author, language, cover_image_url, pdf_url, review, rating, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
@@ -34,7 +34,7 @@ async function getBooks(): Promise<BookItem[]> {
 async function getBlogs(): Promise<BlogItem[]> {
   const { data } = await supabase
     .from('blogs')
-    .select('*')
+    .select('id, title, content, category, cover_image_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
@@ -71,14 +71,12 @@ export default async function HomePage() {
     getBlogs(),
     getSiteSettings()
   ]);
-  const { backgroundImage, quoteOfDay, profileImage } = settings;
+  const { backgroundImage } = settings;
 
   return (
     <main>
       <Header />
       <Hero backgroundImage={backgroundImage} />
-
-      <AboutSection profileImage={profileImage} />
 
       <Reveal>
         <FocusCards />
@@ -89,7 +87,6 @@ export default async function HomePage() {
         calligraphyItems={calligraphyItems}
         books={books}
         blogs={blogs}
-        quoteOfDay={quoteOfDay}
       />
 
       <footer className="py-10 text-center text-sm text-inksoft">

@@ -11,6 +11,77 @@ import {
   supabase
 } from '@/lib/supabase';
 import { useFilters } from './FiltersProvider';
+import { useCart } from './CartProvider';
+
+function CartCountBadge() {
+  const { totalCount } = useCart();
+  if (totalCount === 0) return null;
+  return (
+    <span className="text-[10px] font-bold text-white bg-pink-600 rounded-full w-4 h-4 flex items-center justify-center">
+      {totalCount}
+    </span>
+  );
+}
+
+function CartButton() {
+  const { totalCount } = useCart();
+  return (
+    <Link
+      href="/products"
+      aria-label="View cart"
+      className="relative text-sm font-semibold px-3.5 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 transition-colors"
+    >
+      🛒
+      {totalCount > 0 && (
+        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full ring-2 ring-surface">
+          {totalCount}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function MoreDropdown() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button className="flex items-center gap-1 hover:text-pink-600 transition-colors">
+        More
+        <span className="text-[10px] mt-0.5">▾</span>
+      </button>
+
+      {open && (
+        <div className="absolute top-full right-0 pt-3 z-40">
+          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-48 glass-card">
+            <Link
+              href="/recite"
+              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
+            >
+              📖 Recite Quran
+            </Link>
+            <Link
+              href="/about"
+              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
+            >
+              👤 About the Owner
+            </Link>
+            <Link
+              href="/admin"
+              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
+            >
+              ⚙️ Admin
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function NavDropdown({
   label,
@@ -167,7 +238,7 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="hidden lg:flex gap-7 text-sm font-medium text-inksoft">
+        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-inksoft">
           <NavDropdown
             label="My Art"
             options={ART_SUBCATEGORIES}
@@ -190,22 +261,15 @@ export default function Header() {
           >
             Blog
           </button>
-          <Link href="/recite" className="hover:text-pink-600 transition-colors">
-            Recite
+          <Link href="/products" className="hover:text-pink-600 transition-colors">
+            Shop
           </Link>
-          <Link href="/about" className="hover:text-pink-600 transition-colors">
-            Owner
-          </Link>
+          <MoreDropdown />
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3">
-          <ResumeRequestButton />
-          <Link
-            href="/admin"
-            className="text-sm font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 transition-colors"
-          >
-            Admin
-          </Link>
+        <div className="hidden lg:flex items-center gap-2.5">
+          <CartButton />
+          <ResumeRequestButton className="text-sm font-semibold px-4 py-2 rounded-full border transition-colors" />
           <FeedbackButton className="text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600 shadow-md shadow-pink-400/20 hover:shadow-pink-400/35 transition-shadow" />
         </div>
 
@@ -254,6 +318,13 @@ export default function Header() {
           >
             🎧 Audio Books
           </Link>
+          <Link
+            href="/products"
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600 flex items-center gap-2"
+          >
+            🛍️ Shop <CartCountBadge />
+          </Link>
           <button
             onClick={() => {
               goToSection('blog');
@@ -263,31 +334,36 @@ export default function Header() {
           >
             Blog
           </button>
+
+          <div className="border-t border-borderpink my-2"></div>
+
           <Link
             href="/recite"
             onClick={() => setMenuOpen(false)}
             className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
           >
-            Recite
+            📖 Recite Quran
           </Link>
           <Link
             href="/about"
             onClick={() => setMenuOpen(false)}
             className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
           >
-            Owner
+            👤 About the Owner
           </Link>
+          <Link
+            href="/admin"
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
+          >
+            ⚙️ Admin
+          </Link>
+
           <div className="pt-3">
             <ResumeRequestButton className="w-full block text-center text-sm font-semibold px-4 py-2 rounded-full border transition-colors" />
           </div>
-          <div className="flex gap-3 pt-3">
-            <Link
-              href="/admin"
-              className="flex-1 text-center text-sm font-semibold px-4 py-2 rounded-full border border-borderpink text-inksoft"
-            >
-              Admin
-            </Link>
-            <FeedbackButton className="flex-1 text-sm font-semibold px-4 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600" />
+          <div className="pt-3">
+            <FeedbackButton className="w-full block text-center text-sm font-semibold px-4 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600" />
           </div>
         </div>
       )}
