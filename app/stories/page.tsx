@@ -11,7 +11,7 @@ export const metadata = {
 async function getStories(): Promise<StoryItem[]> {
   const { data } = await supabase
     .from('stories')
-    .select('id, title, author, category, description, cover_image_url, pdf_url, created_at')
+    .select('id, title, author, category, description, cover_image_url, pdf_url, video_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
