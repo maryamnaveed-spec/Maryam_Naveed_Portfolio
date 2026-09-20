@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTheme, ThemeName } from './ThemeProvider';
 
 const palettes: { name: ThemeName; label: string; swatch: string }[] = [
-  { name: 'pink', label: 'Baby Pink', swatch: '#F472A0' },
+  { name: 'pink', label: 'Rosewood', swatch: '#CD6084' },
   { name: 'rose', label: 'Rose', swatch: '#dd5f74' },
   { name: 'crimson', label: 'Crimson', swatch: '#dd5f7f' },
   { name: 'coral', label: 'Coral', swatch: '#dd705f' },

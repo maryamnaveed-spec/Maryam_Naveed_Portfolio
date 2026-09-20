@@ -3,10 +3,10 @@ import Hero from '@/components/Hero';
 import FocusCards from '@/components/FocusCards';
 import HomeSections from '@/components/HomeSections';
 import Reveal from '@/components/Reveal';
-import { supabase, ArtItem, BookItem, BlogItem } from '@/lib/supabase';
+import { supabase, ArtItem, BookItem, StoryItem, BlogItem } from '@/lib/supabase';
 
 // Always fetch fresh data server-side on every visit (no stale ISR/router
-// cache) so newly-added art, books, blog posts, etc. show up immediately -
+// cache) so newly-added art, books, stories, etc. show up immediately -
 // this was previously "revalidate = 30", which could serve an empty/stale
 // snapshot until a hard refresh.
 export const dynamic = 'force-dynamic';
@@ -27,6 +27,14 @@ async function getBooks(): Promise<BookItem[]> {
   const { data } = await supabase
     .from('books')
     .select('id, title, author, language, cover_image_url, pdf_url, review, rating, created_at')
+    .order('created_at', { ascending: false });
+  return data ?? [];
+}
+
+async function getStories(): Promise<StoryItem[]> {
+  const { data } = await supabase
+    .from('stories')
+    .select('id, title, author, category, description, cover_image_url, pdf_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
@@ -64,10 +72,11 @@ async function getSiteSettings(): Promise<{
 }
 
 export default async function HomePage() {
-  const [artItems, calligraphyItems, books, blogs, settings] = await Promise.all([
+  const [artItems, calligraphyItems, books, stories, blogs, settings] = await Promise.all([
     getArts('art'),
     getArts('calligraphy'),
     getBooks(),
+    getStories(),
     getBlogs(),
     getSiteSettings()
   ]);
@@ -86,6 +95,7 @@ export default async function HomePage() {
         artItems={artItems}
         calligraphyItems={calligraphyItems}
         books={books}
+        stories={stories}
         blogs={blogs}
       />
 

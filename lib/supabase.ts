@@ -95,41 +95,28 @@ export type AudioBookItem = {
   created_at: string;
 };
 
-export type ProductCategoryItem = {
+export type StoryItem = {
   id: string;
-  name: string;
-  created_at: string;
-};
-
-export type ProductItem = {
-  id: string;
-  category_id: string | null;
-  name: string;
+  title: string;
+  author: string | null;
+  category: string;
   description: string | null;
-  price: number;
-  image_url: string;
+  cover_image_url: string | null;
+  pdf_url: string;
+  video_url: string | null;
   created_at: string;
 };
 
-export type OrderStatus = 'pending' | 'confirmed' | 'cancelled';
-
-export type OrderCartItem = {
-  product_id: string;
-  name: string;
-  price: number;
-  qty: number;
-};
-
-export type OrderItem = {
-  id: string;
-  customer_name: string;
-  phone: string;
-  address: string | null;
-  items: OrderCartItem[];
-  total: number;
-  status: OrderStatus;
-  created_at: string;
-};
+export const STORY_CATEGORIES = [
+  'Horror',
+  'Mystery',
+  'Fiction',
+  'Non-Fiction',
+  'Romance',
+  'Adventure',
+  'Fantasy',
+  'Poetry'
+];
 
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait', 'Digital Art'];
 export const CALLIGRAPHY_SUBCATEGORIES = [

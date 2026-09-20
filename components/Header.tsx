@@ -1,176 +1,44 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import FeedbackButton from './FeedbackButton';
 import ResumeRequestButton from './ResumeRequestButton';
-import {
-  ART_SUBCATEGORIES,
-  CALLIGRAPHY_SUBCATEGORIES,
-  supabase
-} from '@/lib/supabase';
-import { useFilters } from './FiltersProvider';
-import { useCart } from './CartProvider';
+import { supabase } from '@/lib/supabase';
 
-function CartCountBadge() {
-  const { totalCount } = useCart();
-  if (totalCount === 0) return null;
-  return (
-    <span className="text-[10px] font-bold text-white bg-pink-600 rounded-full w-4 h-4 flex items-center justify-center">
-      {totalCount}
-    </span>
-  );
-}
-
-function CartButton() {
-  const { totalCount } = useCart();
-  return (
-    <Link
-      href="/products"
-      aria-label="View cart"
-      className="relative text-sm font-semibold px-3.5 py-2 rounded-full border border-borderpink text-inksoft hover:bg-pink-50 transition-colors"
-    >
-      🛒
-      {totalCount > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-pink-600 rounded-full ring-2 ring-surface">
-          {totalCount}
-        </span>
-      )}
-    </Link>
-  );
-}
+const NAV_LINKS = [
+  { href: '/gallery', label: 'The Gallery' },
+  { href: '/scriptorium', label: 'The Scriptorium' },
+  { href: '/library', label: 'The Library' },
+  { href: '/stories', label: 'My Stories' }
+];
 
 function MoreDropdown() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button className="flex items-center gap-1 hover:text-pink-600 transition-colors">
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-full tracking-wide hover:text-pink-600 hover:bg-pink-50/60 transition-colors">
         More
-        <span className="text-[10px] mt-0.5">▾</span>
+        <span className={`text-[10px] mt-0.5 transition-transform duration-200 ${open ? '-rotate-180' : ''}`}>▾</span>
       </button>
 
       {open && (
         <div className="absolute top-full right-0 pt-3 z-40">
-          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-48 glass-card">
-            <Link
-              href="/recite"
-              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-            >
+          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-48 glass-card animate-fadeUp origin-top-right">
+            <Link href="/blog" className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600 transition-colors">
+              ✍️ Blog
+            </Link>
+            <Link href="/recite" className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600 transition-colors">
               📖 Recite Quran
             </Link>
-            <Link
-              href="/about"
-              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-            >
+            <Link href="/about" className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600 transition-colors">
               👤 About the Owner
             </Link>
-            <Link
-              href="/admin"
-              className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-            >
+            <Link href="/admin" className="block px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600 transition-colors">
               ⚙️ Admin
             </Link>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NavDropdown({
-  label,
-  options,
-  onSelect,
-  onNavigate
-}: {
-  label: string;
-  options: string[];
-  onSelect: (v: string) => void;
-  onNavigate: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        onClick={onNavigate}
-        className="flex items-center gap-1 hover:text-pink-600 transition-colors"
-      >
-        {label}
-        <span className="text-[10px] mt-0.5">▾</span>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 pt-3 z-40">
-          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-44 glass-card">
-            {['All', ...options].map((opt) => (
-              <button
-                key={opt}
-                onClick={() => {
-                  onSelect(opt);
-                  onNavigate();
-                  setOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function BooksNavDropdown({ onBooks, onAudioBooks }: { onBooks: () => void; onAudioBooks: () => void }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        onClick={onBooks}
-        className="flex items-center gap-1 hover:text-pink-600 transition-colors"
-      >
-        My Books
-        <span className="text-[10px] mt-0.5">▾</span>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 pt-3 z-40">
-          <div className="bg-surface border border-borderpink rounded-xl shadow-xl py-2 w-44 glass-card">
-            <button
-              onClick={() => {
-                onBooks();
-                setOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-            >
-              📚 Books
-            </button>
-            <button
-              onClick={() => {
-                onAudioBooks();
-                setOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-inksoft hover:bg-pink-50 hover:text-pink-600"
-            >
-              🎧 Audio Books
-            </button>
           </div>
         </div>
       )}
@@ -182,8 +50,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const { setArtFilter, setCalligraphyFilter } = useFilters();
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -201,26 +67,16 @@ export default function Header() {
       .then(({ data }) => setProfileImage(data?.profile_image_url ?? null));
   }, []);
 
-  // Works from any page: if we're already on the homepage, just smooth-scroll;
-  // otherwise navigate to the homepage first, then Next.js scrolls to the
-  // section matching the #hash once the page has loaded.
-  function goToSection(id: string) {
-    if (pathname === '/') {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      router.push(`/#${id}`);
-    }
-  }
-
   return (
     <header
-      className={`bg-surface/90 backdrop-blur-md border-b sticky top-0 z-50 transition-shadow duration-300 ${
-        scrolled ? 'border-borderpink shadow-sm' : 'border-transparent'
+      className={`bg-surface/90 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 border-b ${
+        scrolled ? 'border-borderpink shadow-[0_4px_24px_-8px_rgba(0,0,0,0.12)]' : 'border-borderpink/60'
       }`}
     >
+      <div className="h-[2px] w-full bg-gradient-to-r from-pink-400/70 via-gold/70 to-pink-600/70" />
       <div className="max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-lg shadow-md shadow-pink-400/20">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-pink-600 text-white flex items-center justify-center font-display font-semibold text-lg shadow-md shadow-pink-600/25 ring-2 ring-white/70 group-hover:ring-pink-200 transition-all">
             {profileImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={profileImage} alt="Maryam Naveed" className="w-full h-full object-cover" />
@@ -229,48 +85,41 @@ export default function Header() {
             )}
           </div>
           <div>
-            <div className="font-display font-semibold text-lg sm:text-xl leading-tight">
+            <div className="font-display font-semibold text-lg sm:text-xl leading-tight text-ink">
               Maryam Naveed
             </div>
-            <div className="text-[10px] sm:text-[11px] tracking-wide uppercase text-pink-600 font-semibold">
-              Curator of mind & art
+            <div className="text-[10px] sm:text-[11px] tracking-[0.14em] uppercase text-gold font-semibold">
+              Curator of mind &amp; art
             </div>
           </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-inksoft">
-          <NavDropdown
-            label="My Art"
-            options={ART_SUBCATEGORIES}
-            onSelect={setArtFilter}
-            onNavigate={() => goToSection('art')}
-          />
-          <NavDropdown
-            label="My Calligraphy"
-            options={CALLIGRAPHY_SUBCATEGORIES}
-            onSelect={setCalligraphyFilter}
-            onNavigate={() => goToSection('calligraphy')}
-          />
-          <BooksNavDropdown
-            onBooks={() => goToSection('books')}
-            onAudioBooks={() => router.push('/audiobooks')}
-          />
-          <button
-            onClick={() => goToSection('blog')}
-            className="hover:text-pink-600 transition-colors"
-          >
-            Blog
-          </button>
-          <Link href="/products" className="hover:text-pink-600 transition-colors">
-            Shop
-          </Link>
-          <MoreDropdown />
+        <nav className="hidden lg:flex items-center gap-1 text-[13px] font-medium text-inksoft tracking-wide">
+          {NAV_LINKS.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative px-3.5 py-2 rounded-full transition-colors ${
+                  active ? 'text-pink-600 bg-pink-50' : 'hover:text-pink-600 hover:bg-pink-50/60'
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <span className="absolute left-3.5 right-3.5 -bottom-[3px] h-[2px] rounded-full bg-gradient-to-r from-pink-400 to-pink-600" />
+                )}
+              </Link>
+            );
+          })}
+          <div className="px-1.5">
+            <MoreDropdown />
+          </div>
         </nav>
 
         <div className="hidden lg:flex items-center gap-2.5">
-          <CartButton />
-          <ResumeRequestButton className="text-sm font-semibold px-4 py-2 rounded-full border transition-colors" />
-          <FeedbackButton className="text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600 shadow-md shadow-pink-400/20 hover:shadow-pink-400/35 transition-shadow" />
+          <ResumeRequestButton className="text-[13px] font-semibold px-4 py-2 rounded-full border transition-colors" />
+          <FeedbackButton className="text-[13px] font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600 shadow-md shadow-pink-600/20 hover:shadow-lg hover:shadow-pink-600/30 hover:-translate-y-0.5 transition-all" />
         </div>
 
         <button
@@ -283,57 +132,26 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <div className="lg:hidden border-t border-borderpink bg-surface px-5 py-4 flex flex-col gap-1">
-          <button
-            onClick={() => {
-              goToSection('art');
-              setMenuOpen(false);
-            }}
-            className="text-left py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
-          >
-            My Art
-          </button>
-          <button
-            onClick={() => {
-              goToSection('calligraphy');
-              setMenuOpen(false);
-            }}
-            className="text-left py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
-          >
-            My Calligraphy
-          </button>
-          <button
-            onClick={() => {
-              goToSection('books');
-              setMenuOpen(false);
-            }}
-            className="text-left py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
-          >
-            📚 My Books
-          </button>
+        <div className="lg:hidden border-t border-borderpink bg-surface px-5 py-4 flex flex-col gap-1 animate-fadeUp origin-top">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={`py-2.5 text-sm font-medium ${
+                pathname === link.href ? 'text-pink-600' : 'text-inksoft hover:text-pink-600'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
-            href="/audiobooks"
+            href="/blog"
             onClick={() => setMenuOpen(false)}
-            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
-          >
-            🎧 Audio Books
-          </Link>
-          <Link
-            href="/products"
-            onClick={() => setMenuOpen(false)}
-            className="py-2.5 text-sm font-medium text-inksoft hover:text-pink-600 flex items-center gap-2"
-          >
-            🛍️ Shop <CartCountBadge />
-          </Link>
-          <button
-            onClick={() => {
-              goToSection('blog');
-              setMenuOpen(false);
-            }}
-            className="text-left py-2.5 text-sm font-medium text-inksoft hover:text-pink-600"
+            className={`py-2.5 text-sm font-medium ${pathname === '/blog' ? 'text-pink-600' : 'text-inksoft hover:text-pink-600'}`}
           >
             Blog
-          </button>
+          </Link>
 
           <div className="border-t border-borderpink my-2"></div>
 

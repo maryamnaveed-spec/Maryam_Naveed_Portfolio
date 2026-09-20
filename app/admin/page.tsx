@@ -1,14 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { supabase, ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES, BLOG_CATEGORIES } from '@/lib/supabase';
+import { supabase, ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES, BLOG_CATEGORIES, STORY_CATEGORIES } from '@/lib/supabase';
+import { compressImage } from '@/lib/compressImage';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
 import AdminMessages from '@/components/admin/AdminMessages';
 import AdminManageArts from '@/components/admin/AdminManageArts';
 import AdminManageBooks from '@/components/admin/AdminManageBooks';
 import AdminManageAudioBooks from '@/components/admin/AdminManageAudioBooks';
+import AdminManageStories from '@/components/admin/AdminManageStories';
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminManageBlogs from '@/components/admin/AdminManageBlogs';
 import AdminReviews from '@/components/admin/AdminReviews';
@@ -41,7 +41,6 @@ export default function AdminPage() {
 type AdminTab = 'upload' | 'manage' | 'messages' | 'settings' | 'reviews' | 'resume' | 'chat';
 
 function AdminPanel() {
-  const router = useRouter();
   const [tab, setTab] = useState<AdminTab>('messages');
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadReviews, setUnreadReviews] = useState(0);
@@ -91,28 +90,7 @@ function AdminPanel() {
 
   return (
     <div>
-      <AdminStatsOverview
-        onJump={(t) => {
-          if (t === 'products-page') {
-            router.push('/admin/products');
-          } else {
-            setTab(t as AdminTab);
-          }
-        }}
-      />
-
-      <Link
-        href="/admin/products"
-        className="flex items-center justify-between gap-3 mb-6 p-4 rounded-2xl bg-gradient-to-r from-pink-400 to-pink-600 text-white shadow-md hover:shadow-lg transition-shadow"
-      >
-        <span className="flex items-center gap-2.5 text-sm font-semibold">
-          <span className="text-xl" aria-hidden="true">
-            🛍️
-          </span>
-          Shop management — products, categories &amp; orders
-        </span>
-        <span aria-hidden="true">→</span>
-      </Link>
+      <AdminStatsOverview onJump={(t) => setTab(t as AdminTab)} />
 
       <div className="flex flex-col gap-4 mb-8">
         <div className="flex flex-wrap justify-start gap-1.5 bg-pink-50 p-1.5 rounded-2xl sm:rounded-full w-full sm:w-auto">
@@ -161,6 +139,7 @@ function AdminPanel() {
             <ArtUploadForm category="calligraphy" title="Upload new calligraphy" />
             <BookUploadForm />
             <AudioBookUploadForm />
+            <StoryUploadForm />
             <BlogUploadForm />
           </div>
         )}
@@ -171,6 +150,7 @@ function AdminPanel() {
             <AdminManageArts category="calligraphy" title="Manage calligraphy" />
             <AdminManageBooks />
             <AdminManageAudioBooks />
+            <AdminManageStories />
             <AdminManageBlogs />
           </div>
         )}
@@ -201,12 +181,15 @@ function ArtUploadForm({
     if (!file) return setStatus('Please choose an image.');
 
     try {
+      setStatus('Compressing image...');
+      const compressedFile = await compressImage(file);
+
       setStatus('Uploading image...');
 
-      const filePath = `${category}/${Date.now()}-${file.name}`;
+      const filePath = `${category}/${Date.now()}-${compressedFile.name}`;
       const { error: uploadError } = await supabase.storage
         .from('art-images')
-        .upload(filePath, file);
+        .upload(filePath, compressedFile);
       if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
 
       const { data: publicUrl } = supabase.storage
@@ -342,11 +325,13 @@ function BookUploadForm() {
 
       let coverUrl: string | null = null;
       if (coverFile) {
+        setStatus('Compressing cover image...');
+        const compressedCover = await compressImage(coverFile);
         setStatus('Uploading cover image...');
-        const coverPath = `${Date.now()}-${coverFile.name}`;
+        const coverPath = `${Date.now()}-${compressedCover.name}`;
         const { error: coverError } = await supabase.storage
           .from('book-covers')
-          .upload(coverPath, coverFile);
+          .upload(coverPath, compressedCover);
         if (coverError) throw new Error(`Cover upload failed: ${coverError.message}`);
         coverUrl = supabase.storage.from('book-covers').getPublicUrl(coverPath).data.publicUrl;
       }
@@ -475,11 +460,14 @@ function AudioBookUploadForm() {
     }
 
     try {
+      setStatus('Compressing cover image...');
+      const compressedCover = await compressImage(coverFile);
+
       setStatus('Uploading cover image...');
-      const coverPath = `${Date.now()}-${coverFile.name}`;
+      const coverPath = `${Date.now()}-${compressedCover.name}`;
       const { error: coverError } = await supabase.storage
         .from('audiobook-covers')
-        .upload(coverPath, coverFile);
+        .upload(coverPath, compressedCover);
       if (coverError) throw new Error(`Cover upload failed: ${coverError.message}`);
       const coverUrl = supabase.storage.from('audiobook-covers').getPublicUrl(coverPath).data
         .publicUrl;
@@ -554,6 +542,164 @@ function AudioBookUploadForm() {
       <br />
       <button className="mt-1 text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
         Upload audiobook
+      </button>
+      {status && <p className="text-xs text-inksoft mt-3">{status}</p>}
+    </form>
+  );
+}
+
+function StoryUploadForm() {
+  const [form, setForm] = useState({
+    title: '',
+    author: '',
+    category: STORY_CATEGORIES[0],
+    description: ''
+  });
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [status, setStatus] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!pdfFile) return setStatus('Please choose a PDF file.');
+
+    if (pdfFile.size > 50 * 1024 * 1024) {
+      return setStatus(
+        'This PDF is larger than 50MB. Supabase free tier has a 50MB upload limit per file - please compress the PDF or upgrade your plan.'
+      );
+    }
+    if (videoFile && videoFile.size > 50 * 1024 * 1024) {
+      return setStatus(
+        'This video is larger than 50MB. Supabase free tier has a 50MB upload limit per file - please use a shorter/compressed clip.'
+      );
+    }
+
+    try {
+      setStatus('Uploading PDF... this can take a minute for large files.');
+      const pdfPath = `${Date.now()}-${pdfFile.name}`;
+      const { error: pdfError } = await supabase.storage.from('story-pdfs').upload(pdfPath, pdfFile);
+      if (pdfError) throw new Error(`PDF upload failed: ${pdfError.message}`);
+      const pdfUrl = supabase.storage.from('story-pdfs').getPublicUrl(pdfPath).data.publicUrl;
+
+      let coverUrl: string | null = null;
+      if (coverFile) {
+        setStatus('Compressing cover image...');
+        const compressedCover = await compressImage(coverFile);
+        setStatus('Uploading cover image...');
+        const coverPath = `${Date.now()}-${compressedCover.name}`;
+        const { error: coverError } = await supabase.storage
+          .from('story-covers')
+          .upload(coverPath, compressedCover);
+        if (coverError) throw new Error(`Cover upload failed: ${coverError.message}`);
+        coverUrl = supabase.storage.from('story-covers').getPublicUrl(coverPath).data.publicUrl;
+      }
+
+      let videoUrl: string | null = null;
+      if (videoFile) {
+        setStatus('Uploading video... this can take a minute for large files.');
+        const videoPath = `${Date.now()}-${videoFile.name}`;
+        const { error: videoError } = await supabase.storage
+          .from('story-videos')
+          .upload(videoPath, videoFile);
+        if (videoError) throw new Error(`Video upload failed: ${videoError.message}`);
+        videoUrl = supabase.storage.from('story-videos').getPublicUrl(videoPath).data.publicUrl;
+      }
+
+      setStatus('Saving story details...');
+      const { error: insertError } = await supabase.from('stories').insert({
+        title: form.title,
+        author: form.author || null,
+        category: form.category,
+        description: form.description || null,
+        pdf_url: pdfUrl,
+        cover_image_url: coverUrl,
+        video_url: videoUrl
+      });
+      if (insertError) throw new Error(`Saving story failed: ${insertError.message}`);
+    } catch (err: any) {
+      setStatus(err.message || 'Something went wrong. Please try again.');
+      return;
+    }
+
+    setStatus('Story uploaded successfully. Check the My Stories page to see it.');
+    setForm({ title: '', author: '', category: STORY_CATEGORIES[0], description: '' });
+    setPdfFile(null);
+    setCoverFile(null);
+    setVideoFile(null);
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-surface border border-borderpink rounded-card p-6 card-shadow w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+    >
+      <h3 className="text-lg mb-4">Upload new story</h3>
+      <input
+        type="text"
+        placeholder="Story title"
+        value={form.title}
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        required
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      />
+      <input
+        type="text"
+        placeholder="Author (optional)"
+        value={form.author}
+        onChange={(e) => setForm({ ...form, author: e.target.value })}
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      />
+      <label className="block text-xs font-semibold mb-1.5">Category</label>
+      <select
+        value={form.category}
+        onChange={(e) => setForm({ ...form, category: e.target.value })}
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      >
+        {STORY_CATEGORIES.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
+      <textarea
+        placeholder="Short description (optional)"
+        value={form.description}
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+        rows={2}
+        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
+      />
+
+      <label className="block text-xs font-semibold mb-1.5">PDF file</label>
+      <input
+        type="file"
+        accept="application/pdf,.pdf"
+        onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
+        required
+        className="text-sm mb-3"
+      />
+      <br />
+      <label className="block text-xs font-semibold mb-1.5">Cover image (optional)</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+        className="text-sm mb-3"
+      />
+      <br />
+      <label className="block text-xs font-semibold mb-1.5">Video (optional)</label>
+      <input
+        type="file"
+        accept="video/*"
+        onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+        className="text-sm mb-3"
+      />
+      <p className="text-[11px] text-inksoft/60 -mt-2 mb-3">
+        Shows on the story&rsquo;s card on the My Stories page (e.g. a short trailer or reading).
+      </p>
+      <br />
+      <button className="mt-1 text-sm font-semibold px-5 py-2 rounded-full text-white bg-gradient-to-br from-pink-400 to-pink-600">
+        Upload story
       </button>
       {status && <p className="text-xs text-inksoft mt-3">{status}</p>}
     </form>

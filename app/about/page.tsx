@@ -50,7 +50,7 @@ export default async function AboutPage() {
 
           <div className="glass-card border border-borderpink rounded-3xl p-8 sm:p-12 card-shadow space-y-6 text-inksoft text-[15px] leading-relaxed">
             <p>
-              I am a librarian, and calligraphy enthusiast with a deep
+              I am a librarian, painter, and calligraphy enthusiast with a deep
               appreciation for knowledge, creativity, and human understanding.
               My journey is inspired by the belief that books expand our
               minds, art gives shape to emotions, and every individual carries
@@ -101,7 +101,7 @@ export default async function AboutPage() {
 
           <div className="text-center mt-10">
             <Link
-              href="/#art"
+              href="/gallery"
               className="inline-block px-6 py-3 rounded-full font-semibold text-sm text-white bg-gradient-to-br from-pink-400 to-pink-600 shadow-lg shadow-pink-400/25 hover:shadow-pink-400/40 transition-shadow"
             >
               Explore the portfolio

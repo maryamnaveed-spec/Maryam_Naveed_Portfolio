@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { BlogItem, BLOG_CATEGORIES } from '@/lib/supabase';
 import BlogModal from './BlogModal';
 
@@ -51,12 +50,12 @@ export default function BlogSection({ blogs }: { blogs: BlogItem[] }) {
             >
               {blog.cover_image_url ? (
                 <div className="relative w-full aspect-[4/3] bg-pink-50 flex items-center justify-center overflow-hidden">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={blog.cover_image_url}
                     alt={blog.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-contain"
+                    loading="lazy"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ) : (

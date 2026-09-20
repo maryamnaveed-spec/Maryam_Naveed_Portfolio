@@ -257,61 +257,35 @@ drop policy if exists "Authenticated can delete audio books" on audio_books;
 create policy "Authenticated can delete audio books"
   on audio_books for delete to authenticated using (true);
 
--- ============ 11. PRODUCTS / SHOP ============
-create table if not exists product_categories (
+-- ============ 11. STORIES table (My Written Stories) ============
+create table if not exists stories (
   id uuid primary key default gen_random_uuid(),
-  name text not null unique,
-  created_at timestamp with time zone default now()
-);
-alter table product_categories enable row level security;
-
-drop policy if exists "Public can view product categories" on product_categories;
-create policy "Public can view product categories" on product_categories for select using (true);
-drop policy if exists "Authenticated can manage product categories" on product_categories;
-create policy "Authenticated can manage product categories"
-  on product_categories for all to authenticated using (true) with check (true);
-
-create table if not exists products (
-  id uuid primary key default gen_random_uuid(),
-  category_id uuid references product_categories(id) on delete set null,
-  name text not null,
+  title text not null,
+  author text,
+  category text not null,
   description text,
-  price numeric(10, 2) not null default 0,
-  image_url text not null,
+  cover_image_url text,
+  pdf_url text not null,
+  video_url text,
   created_at timestamp with time zone default now()
 );
-alter table products enable row level security;
+alter table stories add column if not exists video_url text;
+alter table stories enable row level security;
 
-drop policy if exists "Public can view products" on products;
-create policy "Public can view products" on products for select using (true);
-drop policy if exists "Authenticated can manage products" on products;
-create policy "Authenticated can manage products"
-  on products for all to authenticated using (true) with check (true);
+drop policy if exists "Public can view stories" on stories;
+create policy "Public can view stories" on stories for select using (true);
 
--- Orders: no online payment gateway is wired up (would need a provider
--- like Stripe/JazzCash/PayFast + API keys), so this captures the order +
--- calculated total for the admin to confirm and arrange payment manually
--- (cash on delivery / bank transfer / whatever Maryam prefers).
-create table if not exists orders (
-  id uuid primary key default gen_random_uuid(),
-  customer_name text not null,
-  phone text not null,
-  address text,
-  items jsonb not null,
-  total numeric(10, 2) not null,
-  status text not null default 'pending' check (status in ('pending', 'confirmed', 'cancelled')),
-  created_at timestamp with time zone default now()
-);
-alter table orders enable row level security;
+drop policy if exists "Authenticated can insert stories" on stories;
+create policy "Authenticated can insert stories"
+  on stories for insert to authenticated with check (true);
 
-drop policy if exists "Public can place orders" on orders;
-create policy "Public can place orders" on orders for insert to anon, authenticated with check (true);
-drop policy if exists "Authenticated can view orders" on orders;
-create policy "Authenticated can view orders" on orders for select to authenticated using (true);
-drop policy if exists "Authenticated can update orders" on orders;
-create policy "Authenticated can update orders" on orders for update to authenticated using (true);
-drop policy if exists "Authenticated can delete orders" on orders;
-create policy "Authenticated can delete orders" on orders for delete to authenticated using (true);
+drop policy if exists "Authenticated can update stories" on stories;
+create policy "Authenticated can update stories"
+  on stories for update to authenticated using (true);
+
+drop policy if exists "Authenticated can delete stories" on stories;
+create policy "Authenticated can delete stories"
+  on stories for delete to authenticated using (true);
 
 -- Storage bucket for before/after GIFs
 insert into storage.buckets (id, name, public) values ('art-before-after', 'art-before-after', true) on conflict (id) do nothing;
@@ -347,13 +321,6 @@ insert into storage.buckets (id, name, public) values ('blog-covers', 'blog-cove
 insert into storage.buckets (id, name, public) values ('resume-files', 'resume-files', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('audiobook-covers', 'audiobook-covers', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('audiobook-files', 'audiobook-files', true) on conflict (id) do nothing;
-insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true) on conflict (id) do nothing;
-
-drop policy if exists "Public read product-images" on storage.objects;
-create policy "Public read product-images" on storage.objects for select using (bucket_id = 'product-images');
-drop policy if exists "Authenticated upload product-images" on storage.objects;
-create policy "Authenticated upload product-images"
-  on storage.objects for insert to authenticated with check (bucket_id = 'product-images');
 
 drop policy if exists "Public read audiobook-covers" on storage.objects;
 create policy "Public read audiobook-covers" on storage.objects for select using (bucket_id = 'audiobook-covers');
@@ -394,6 +361,32 @@ create policy "Public read book-covers" on storage.objects for select using (buc
 drop policy if exists "Authenticated upload book-covers" on storage.objects;
 create policy "Authenticated upload book-covers"
   on storage.objects for insert to authenticated with check (bucket_id = 'book-covers');
+
+insert into storage.buckets (id, name, public) values ('story-pdfs', 'story-pdfs', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('story-covers', 'story-covers', true) on conflict (id) do nothing;
+
+drop policy if exists "Public read story-pdfs" on storage.objects;
+create policy "Public read story-pdfs" on storage.objects for select using (bucket_id = 'story-pdfs');
+
+drop policy if exists "Authenticated upload story-pdfs" on storage.objects;
+create policy "Authenticated upload story-pdfs"
+  on storage.objects for insert to authenticated with check (bucket_id = 'story-pdfs');
+
+drop policy if exists "Public read story-covers" on storage.objects;
+create policy "Public read story-covers" on storage.objects for select using (bucket_id = 'story-covers');
+
+drop policy if exists "Authenticated upload story-covers" on storage.objects;
+create policy "Authenticated upload story-covers"
+  on storage.objects for insert to authenticated with check (bucket_id = 'story-covers');
+
+insert into storage.buckets (id, name, public) values ('story-videos', 'story-videos', true) on conflict (id) do nothing;
+
+drop policy if exists "Public read story-videos" on storage.objects;
+create policy "Public read story-videos" on storage.objects for select using (bucket_id = 'story-videos');
+
+drop policy if exists "Authenticated upload story-videos" on storage.objects;
+create policy "Authenticated upload story-videos"
+  on storage.objects for insert to authenticated with check (bucket_id = 'story-videos');
 
 drop policy if exists "Public read blog-covers" on storage.objects;
 create policy "Public read blog-covers" on storage.objects for select using (bucket_id = 'blog-covers');

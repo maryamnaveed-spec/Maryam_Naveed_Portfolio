@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { ArtItem } from '@/lib/supabase';
 import CommentsBox from './CommentsBox';
 import ModalPortal from './ModalPortal';
@@ -25,12 +24,11 @@ export default function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-full h-[50vh] sm:h-[60vh] bg-pink-50">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={item.image_url}
             alt={item.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 768px"
-            className="object-contain"
+            className="absolute inset-0 w-full h-full object-contain"
           />
           <button
             onClick={onClose}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase, ProductCategoryItem, ProductItem } from '@/lib/supabase';
 import { formatPKR } from '@/lib/currency';
+import { compressImage } from '@/lib/compressImage';
 
 export default function AdminProducts() {
   const [categories, setCategories] = useState<ProductCategoryItem[]>([]);
@@ -18,15 +19,20 @@ export default function AdminProducts() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', description: '', price: '', category_id: '' });
+  const [loadError, setLoadError] = useState('');
 
   async function load() {
     setLoading(true);
-    const [{ data: cats }, { data: prods }] = await Promise.all([
+    setLoadError('');
+    const [catRes, prodRes] = await Promise.all([
       supabase.from('product_categories').select('*').order('created_at', { ascending: true }),
       supabase.from('products').select('*').order('created_at', { ascending: false })
     ]);
-    setCategories(cats ?? []);
-    setProducts(prods ?? []);
+    if (catRes.error || prodRes.error) {
+      setLoadError(catRes.error?.message || prodRes.error?.message || 'Unknown error');
+    }
+    setCategories(catRes.data ?? []);
+    setProducts(prodRes.data ?? []);
     setLoading(false);
   }
 
@@ -61,9 +67,12 @@ export default function AdminProducts() {
     if (isNaN(priceNum) || priceNum < 0) return setStatus('Please enter a valid price.');
 
     try {
+      setStatus('Compressing photo...');
+      const compressed = await compressImage(imageFile);
+
       setStatus('Uploading photo...');
-      const path = `${Date.now()}-${imageFile.name}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(path, imageFile);
+      const path = `${Date.now()}-${compressed.name}`;
+      const { error: uploadError } = await supabase.storage.from('product-images').upload(path, compressed);
       if (uploadError) throw new Error(uploadError.message);
       const imageUrl = supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
 
@@ -209,8 +218,14 @@ export default function AdminProducts() {
       {/* Manage products */}
       <div className="bg-surface border border-borderpink rounded-card p-6 card-shadow sm:col-span-2">
         <h3 className="text-lg mb-4">Manage products</h3>
+        {loadError && (
+          <div className="mb-4 text-sm bg-red-50 border border-red-200 text-red-600 rounded-xl p-3">
+            <p className="font-semibold">Couldn&rsquo;t load products/categories:</p>
+            <p className="text-xs mt-1">{loadError}</p>
+          </div>
+        )}
         {loading && <p className="text-sm text-inksoft">Loading...</p>}
-        {!loading && products.length === 0 && (
+        {!loading && !loadError && products.length === 0 && (
           <p className="text-sm text-inksoft italic">No products yet.</p>
         )}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">

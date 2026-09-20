@@ -1,23 +1,25 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArtItem, BookItem, BlogItem } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+import { ArtItem, BookItem, BlogItem, StoryItem } from '@/lib/supabase';
 
 type SearchResult = {
   key: string;
   rawId: string;
-  type: 'Art' | 'Calligraphy' | 'Book' | 'Blog';
+  type: 'Art' | 'Calligraphy' | 'Book' | 'Story' | 'Blog';
   icon: string;
   title: string;
   subtitle: string;
   image: string | null;
-  sectionId: string;
+  pageUrl: string;
 };
 
 const TYPE_STYLES: Record<SearchResult['type'], string> = {
   Art: 'text-pink-600 bg-pink-50',
   Calligraphy: 'text-violet-600 bg-violet-50',
   Book: 'text-amber-700 bg-amber-50',
+  Story: 'text-fuchsia-700 bg-fuchsia-50',
   Blog: 'text-emerald-700 bg-emerald-50'
 };
 
@@ -25,17 +27,16 @@ export default function SiteSearch({
   artItems,
   calligraphyItems,
   books,
-  blogs,
-  onNeedsArtFilterReset,
-  onNeedsCalligraphyFilterReset
+  stories,
+  blogs
 }: {
   artItems: ArtItem[];
   calligraphyItems: ArtItem[];
   books: BookItem[];
+  stories: StoryItem[];
   blogs: BlogItem[];
-  onNeedsArtFilterReset?: () => void;
-  onNeedsCalligraphyFilterReset?: () => void;
 }) {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
 
@@ -48,7 +49,7 @@ export default function SiteSearch({
       title: a.title,
       subtitle: [a.subcategory, a.description].filter(Boolean).join(' — '),
       image: a.image_url,
-      sectionId: 'art'
+      pageUrl: '/gallery'
     }));
     const calligraphy: SearchResult[] = calligraphyItems.map((a) => ({
       key: `cal-${a.id}`,
@@ -58,7 +59,7 @@ export default function SiteSearch({
       title: a.title,
       subtitle: [a.subcategory, a.description].filter(Boolean).join(' — '),
       image: a.image_url,
-      sectionId: 'calligraphy'
+      pageUrl: '/scriptorium'
     }));
     const bookResults: SearchResult[] = books.map((b) => ({
       key: `book-${b.id}`,
@@ -68,7 +69,17 @@ export default function SiteSearch({
       title: b.title,
       subtitle: b.author || '',
       image: b.cover_image_url,
-      sectionId: 'books'
+      pageUrl: '/library'
+    }));
+    const storyResults: SearchResult[] = stories.map((s) => ({
+      key: `story-${s.id}`,
+      rawId: s.id,
+      type: 'Story',
+      icon: '📖',
+      title: s.title,
+      subtitle: [s.category, s.author ? `by ${s.author}` : ''].filter(Boolean).join(' — '),
+      image: s.cover_image_url,
+      pageUrl: '/stories'
     }));
     const blogResults: SearchResult[] = blogs.map((b) => ({
       key: `blog-${b.id}`,
@@ -78,10 +89,10 @@ export default function SiteSearch({
       title: b.title,
       subtitle: b.content ? b.content.slice(0, 80) : '',
       image: b.cover_image_url,
-      sectionId: 'blog'
+      pageUrl: '/blog'
     }));
-    return [...art, ...calligraphy, ...bookResults, ...blogResults];
-  }, [artItems, calligraphyItems, books, blogs]);
+    return [...art, ...calligraphy, ...bookResults, ...storyResults, ...blogResults];
+  }, [artItems, calligraphyItems, books, stories, blogs]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -96,40 +107,17 @@ export default function SiteSearch({
       .slice(0, 8);
   }, [query, allResults]);
 
-  function scrollToElement(rawId: string, sectionId: string) {
-    const el = document.querySelector(`[data-search-id="${rawId}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('search-highlight-pulse');
-      setTimeout(() => el.classList.remove('search-highlight-pulse'), 3600);
-    } else {
-      // Item exists but its card isn't in the DOM yet (e.g. filtered out) -
-      // fall back to the section itself so the person still lands close by.
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
   function goTo(result: SearchResult) {
     setQuery('');
     setFocused(false);
-
-    // Art/Calligraphy grids can be filtered down to a subcategory - if the
-    // matched item isn't in the currently visible subset, clear the filter
-    // first so its card actually exists in the DOM to scroll to.
-    if (result.type === 'Art') onNeedsArtFilterReset?.();
-    if (result.type === 'Calligraphy') onNeedsCalligraphyFilterReset?.();
-
-    // Give React a tick to re-render the unfiltered grid before measuring
-    // and scrolling to the exact card.
-    requestAnimationFrame(() => {
-      setTimeout(() => scrollToElement(result.rawId, result.sectionId), 60);
-    });
+    // Every content type now lives on its own dedicated page.
+    router.push(result.pageUrl);
   }
 
   const showDropdown = focused && query.trim().length >= 2;
 
   return (
-    <div className="relative max-w-2xl mx-auto">
+    <div className="relative max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto">
       <div className="search-glow rounded-2xl">
         <div className="relative flex items-center bg-surface rounded-2xl border border-borderpink shadow-lg shadow-pink-400/5 focus-within:border-pink-400 focus-within:shadow-xl focus-within:shadow-pink-400/15 transition-all duration-300 px-5 py-4">
           <span className="text-xl mr-3 flex-shrink-0 text-pink-500" aria-hidden="true">
@@ -141,7 +129,7 @@ export default function SiteSearch({
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
-            placeholder="Search art, calligraphy, books, blog posts..."
+            placeholder="Search art, calligraphy, books, stories, blog posts..."
             className="flex-1 bg-transparent outline-none text-sm sm:text-base placeholder:text-inksoft/45 font-medium"
           />
           {query && (

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { ProductCategoryItem, ProductItem } from '@/lib/supabase';
 import { formatPKR } from '@/lib/currency';
 import { useCart } from './CartProvider';
@@ -15,12 +14,12 @@ function ProductCard({ product }: { product: ProductItem }) {
     <div className="group bg-surface border border-borderpink rounded-2xl overflow-hidden card-shadow transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-pink-200 flex flex-col">
       <div className="relative w-full aspect-square overflow-hidden bg-pink-50">
         {product.image_url ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={product.image_url}
             alt={product.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-3xl">🛍️</div>

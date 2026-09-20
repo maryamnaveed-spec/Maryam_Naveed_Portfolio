@@ -29,42 +29,48 @@ export default function Reveal({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Safety net: if IntersectionObserver never fires for any reason on
+    // some device/browser, don't leave the content permanently invisible.
+    const fallback = setTimeout(() => setVisible(true), 1500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
 
   return (
     <div
       ref={ref}
-      className={`${visible ? 'page-turn-in' : 'page-turn-init'} ${className}`}
+      className={`${visible ? 'reveal-in' : 'reveal-init'} ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {children}
       <style jsx>{`
-        .page-turn-init {
+        .reveal-init {
           opacity: 0;
-          transform: perspective(1400px) rotateY(-6deg) translateX(-18px);
-          transform-origin: left center;
+          transform: translateY(20px);
         }
-        .page-turn-in {
-          animation: pageTurnIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          transform-origin: left center;
+        .reveal-in {
+          animation: revealIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        @keyframes pageTurnIn {
-          0% {
+        @keyframes revealIn {
+          from {
             opacity: 0;
-            transform: perspective(1400px) rotateY(-10deg) translateX(-24px);
+            transform: translateY(20px);
           }
-          100% {
+          to {
             opacity: 1;
-            transform: perspective(1400px) rotateY(0deg) translateX(0);
+            transform: translateY(0);
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .page-turn-init {
+          .reveal-init {
             opacity: 1;
             transform: none;
           }
-          .page-turn-in {
+          .reveal-in {
             animation: none;
           }
         }

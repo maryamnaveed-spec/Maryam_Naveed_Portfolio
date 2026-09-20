@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Cormorant_Garamond, Playfair_Display, Caveat } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { FiltersProvider } from '@/components/FiltersProvider';
-import { CartProvider } from '@/components/CartProvider';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import CustomCursor from '@/components/CustomCursor';
 import ChatWidget from '@/components/ChatWidget';
@@ -62,23 +60,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable} ${playfair.variable} ${caveat.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${cormorant.variable} ${playfair.variable} ${caveat.variable}`}>
       <head>
         <link rel="preconnect" href="https://mozilla.github.io" />
         <link rel="dns-prefetch" href="https://mozilla.github.io" />
       </head>
       <body>
         <ThemeProvider>
-          <FiltersProvider>
-            <CartProvider>
-              <InstallPrompt />
-              {children}
-              <ThemeSwitcher />
-              <CustomCursor />
-              <ChatWidget />
-              <PWARegister />
-            </CartProvider>
-          </FiltersProvider>
+          <InstallPrompt />
+          {children}
+          <ThemeSwitcher />
+          <CustomCursor />
+          <ChatWidget />
+          <PWARegister />
         </ThemeProvider>
       </body>
     </html>

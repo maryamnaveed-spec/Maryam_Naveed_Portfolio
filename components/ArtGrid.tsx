@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { ArtItem } from '@/lib/supabase';
 import ImageLightbox from './ImageLightbox';
 import ShareButtons from './ShareButtons';
@@ -34,12 +33,12 @@ export default function ArtGrid({
             className="group glass-card rounded-card overflow-hidden card-shadow cursor-pointer border border-borderpink transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-pink-400/50 hover:shadow-pink-400/15"
           >
             <div className="relative h-44 bg-pink-50 overflow-hidden">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={item.image_url}
                 alt={item.title}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {item.before_after_gif_url && (
                 // eslint-disable-next-line @next/next/no-img-element

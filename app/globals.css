@@ -6,20 +6,20 @@
    no external Google Fonts round-trip) — see the --font-* variables
    referenced below. */
 
-/* ===== Default theme: Baby Pink ===== */
+/* ===== Default theme: Rosewood (elegant, premium) ===== */
 :root {
-  --bg: 255 246 249;
+  --bg: 253 247 248;
   --surface: 255 255 255;
-  --pink-50: 255 233 240;
-  --pink-100: 251 211 226;
-  --pink-300: 249 168 199;
-  --pink-400: 244 114 160;
-  --pink-600: 217 78 128;
-  --ink: 61 31 51;
-  --inksoft: 110 78 99;
-  --gold: 201 154 68;
-  --goldlight: 241 223 184;
-  --borderpink: 243 217 227;
+  --pink-50: 250 231 237;
+  --pink-100: 243 203 216;
+  --pink-300: 224 143 168;
+  --pink-400: 205 96 132;
+  --pink-600: 163 48 88;
+  --ink: 41 20 32;
+  --inksoft: 96 66 82;
+  --gold: 178 138 68;
+  --goldlight: 236 219 182;
+  --borderpink: 238 213 222;
 }
 
 /* ===== Lavender theme ===== */
