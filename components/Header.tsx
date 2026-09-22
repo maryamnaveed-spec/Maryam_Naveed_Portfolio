@@ -8,9 +8,9 @@ import ResumeRequestButton from './ResumeRequestButton';
 import { supabase } from '@/lib/supabase';
 
 const NAV_LINKS = [
-  { href: '/gallery', label: 'The Gallery' },
-  { href: '/scriptorium', label: 'The Scriptorium' },
-  { href: '/library', label: 'The Library' },
+  { href: '/gallery', label: 'My Gallery' },
+  { href: '/scriptorium', label: 'My Calligraphy' },
+  { href: '/library', label: 'My Library' },
   { href: '/stories', label: 'My Stories' }
 ];
 

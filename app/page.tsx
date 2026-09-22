@@ -80,12 +80,12 @@ export default async function HomePage() {
     getBlogs(),
     getSiteSettings()
   ]);
-  const { backgroundImage } = settings;
+  const { profileImage } = settings;
 
   return (
     <main>
       <Header />
-      <Hero backgroundImage={backgroundImage} />
+      <Hero profileImage={profileImage} />
 
       <Reveal>
         <FocusCards />
