@@ -262,7 +262,6 @@ create table if not exists stories (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   author text,
-  category text not null,
   description text,
   cover_image_url text,
   pdf_url text not null,
@@ -270,6 +269,8 @@ create table if not exists stories (
   created_at timestamp with time zone default now()
 );
 alter table stories add column if not exists video_url text;
+-- Story genres/categories were removed from the site; drop the old column if it exists.
+alter table stories drop column if exists category;
 alter table stories enable row level security;
 
 drop policy if exists "Public can view stories" on stories;

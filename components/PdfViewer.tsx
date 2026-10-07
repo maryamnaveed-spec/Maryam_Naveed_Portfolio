@@ -11,6 +11,7 @@ export default function PdfViewer({ url }: { url: string }) {
   const [pageNum, setPageNum] = useState(1);
   const [numPages, setNumPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
 
   // Load the document once.
@@ -19,6 +20,7 @@ export default function PdfViewer({ url }: { url: string }) {
 
     async function load() {
       setLoading(true);
+      setProgress(0);
       setError('');
       try {
         // Import the package's main entry - deep subpaths like
@@ -27,7 +29,12 @@ export default function PdfViewer({ url }: { url: string }) {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-        const doc = await pdfjsLib.getDocument(url).promise;
+        const loadingTask = pdfjsLib.getDocument(url);
+        loadingTask.onProgress = (p: { loaded: number; total: number }) => {
+          if (p.total) setProgress(Math.min(100, Math.round((p.loaded / p.total) * 100)));
+        };
+
+        const doc = await loadingTask.promise;
         if (cancelled) return;
 
         pdfDocRef.current = doc;
@@ -115,7 +122,7 @@ export default function PdfViewer({ url }: { url: string }) {
         {loading && (
           <div className="flex flex-col items-center justify-center gap-3 text-inksoft text-sm h-full">
             <div className="w-8 h-8 rounded-full border-2 border-pink-200 border-t-pink-600 animate-spin" />
-            <span>Opening book...</span>
+            <span>{progress > 0 ? `Opening book... ${progress}%` : 'Opening book...'}</span>
           </div>
         )}
         {!loading && error && (

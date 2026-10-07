@@ -99,24 +99,12 @@ export type StoryItem = {
   id: string;
   title: string;
   author: string | null;
-  category: string;
   description: string | null;
   cover_image_url: string | null;
   pdf_url: string;
   video_url: string | null;
   created_at: string;
 };
-
-export const STORY_CATEGORIES = [
-  'Horror',
-  'Mystery',
-  'Fiction',
-  'Non-Fiction',
-  'Romance',
-  'Adventure',
-  'Fantasy',
-  'Poetry'
-];
 
 export const ART_SUBCATEGORIES = ['Islamic Art', 'Sketch', 'Landscape', 'Portrait', 'Digital Art'];
 export const CALLIGRAPHY_SUBCATEGORIES = [

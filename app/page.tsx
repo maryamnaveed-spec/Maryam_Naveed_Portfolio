@@ -34,7 +34,7 @@ async function getBooks(): Promise<BookItem[]> {
 async function getStories(): Promise<StoryItem[]> {
   const { data } = await supabase
     .from('stories')
-    .select('id, title, author, category, description, cover_image_url, pdf_url, video_url, created_at')
+    .select('id, title, author, description, cover_image_url, pdf_url, video_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
@@ -80,12 +80,12 @@ export default async function HomePage() {
     getBlogs(),
     getSiteSettings()
   ]);
-  const { profileImage } = settings;
+  const { backgroundImage } = settings;
 
   return (
     <main>
       <Header />
-      <Hero profileImage={profileImage} />
+      <Hero backgroundImage={backgroundImage} />
 
       <Reveal>
         <FocusCards />

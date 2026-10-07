@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES, BLOG_CATEGORIES, STORY_CATEGORIES } from '@/lib/supabase';
+import { supabase, ART_SUBCATEGORIES, CALLIGRAPHY_SUBCATEGORIES, BLOG_CATEGORIES } from '@/lib/supabase';
 import { compressImage } from '@/lib/compressImage';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
 import AdminMessages from '@/components/admin/AdminMessages';
@@ -552,7 +552,6 @@ function StoryUploadForm() {
   const [form, setForm] = useState({
     title: '',
     author: '',
-    category: STORY_CATEGORIES[0],
     description: ''
   });
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -610,7 +609,6 @@ function StoryUploadForm() {
       const { error: insertError } = await supabase.from('stories').insert({
         title: form.title,
         author: form.author || null,
-        category: form.category,
         description: form.description || null,
         pdf_url: pdfUrl,
         cover_image_url: coverUrl,
@@ -623,7 +621,7 @@ function StoryUploadForm() {
     }
 
     setStatus('Story uploaded successfully. Check the My Stories page to see it.');
-    setForm({ title: '', author: '', category: STORY_CATEGORIES[0], description: '' });
+    setForm({ title: '', author: '', description: '' });
     setPdfFile(null);
     setCoverFile(null);
     setVideoFile(null);
@@ -650,18 +648,6 @@ function StoryUploadForm() {
         onChange={(e) => setForm({ ...form, author: e.target.value })}
         className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
       />
-      <label className="block text-xs font-semibold mb-1.5">Category</label>
-      <select
-        value={form.category}
-        onChange={(e) => setForm({ ...form, category: e.target.value })}
-        className="w-full border border-borderpink rounded-lg px-3 py-2 text-sm mb-3"
-      >
-        {STORY_CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
       <textarea
         placeholder="Short description (optional)"
         value={form.description}

@@ -82,9 +82,6 @@ export default function StoryGrid({ stories }: { stories: StoryItem[] }) {
               ) : (
                 '📖'
               )}
-              <span className="absolute top-2 left-2 text-[9px] font-semibold uppercase tracking-wide text-white bg-black/45 backdrop-blur-sm px-2 py-1 rounded-full">
-                {story.category}
-              </span>
               {story.video_url && (
                 <button
                   onClick={(e) => {

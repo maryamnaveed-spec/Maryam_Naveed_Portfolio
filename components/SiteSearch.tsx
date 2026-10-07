@@ -77,7 +77,7 @@ export default function SiteSearch({
       type: 'Story',
       icon: '📖',
       title: s.title,
-      subtitle: [s.category, s.author ? `by ${s.author}` : ''].filter(Boolean).join(' — '),
+      subtitle: s.author ? `by ${s.author}` : '',
       image: s.cover_image_url,
       pageUrl: '/stories'
     }));

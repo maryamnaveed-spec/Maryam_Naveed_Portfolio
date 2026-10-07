@@ -1,6 +1,6 @@
 import Header from '@/components/Header';
 import StoriesPageView from '@/components/StoriesPageView';
-import { supabase, StoryItem, STORY_CATEGORIES } from '@/lib/supabase';
+import { supabase, StoryItem } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,7 @@ export const metadata = {
 async function getStories(): Promise<StoryItem[]> {
   const { data } = await supabase
     .from('stories')
-    .select('id, title, author, category, description, cover_image_url, pdf_url, video_url, created_at')
+    .select('id, title, author, description, cover_image_url, pdf_url, video_url, created_at')
     .order('created_at', { ascending: false });
   return data ?? [];
 }
@@ -35,7 +35,7 @@ export default async function StoriesPage() {
             </p>
           </div>
 
-          <StoriesPageView stories={stories} categories={STORY_CATEGORIES} />
+          <StoriesPageView stories={stories} />
         </div>
       </section>
 

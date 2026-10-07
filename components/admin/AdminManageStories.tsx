@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, StoryItem, STORY_CATEGORIES } from '@/lib/supabase';
+import { supabase, StoryItem } from '@/lib/supabase';
 
 export default function AdminManageStories() {
   const [items, setItems] = useState<StoryItem[]>([]);
@@ -10,7 +10,6 @@ export default function AdminManageStories() {
   const [editForm, setEditForm] = useState({
     title: '',
     author: '',
-    category: STORY_CATEGORIES[0],
     description: ''
   });
 
@@ -33,7 +32,6 @@ export default function AdminManageStories() {
     setEditForm({
       title: item.title,
       author: item.author ?? '',
-      category: item.category,
       description: item.description ?? ''
     });
   }
@@ -44,7 +42,6 @@ export default function AdminManageStories() {
       .update({
         title: editForm.title,
         author: editForm.author || null,
-        category: editForm.category,
         description: editForm.description || null
       })
       .eq('id', id);
@@ -83,17 +80,6 @@ export default function AdminManageStories() {
                   placeholder="Author (optional)"
                   className="w-full border border-borderpink rounded px-2 py-1 text-sm mb-2"
                 />
-                <select
-                  value={editForm.category}
-                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                  className="w-full border border-borderpink rounded px-2 py-1 text-sm mb-2"
-                >
-                  {STORY_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
                 <textarea
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -121,11 +107,8 @@ export default function AdminManageStories() {
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate">{item.title}</p>
                   {item.author && <p className="text-xs text-inksoft truncate">by {item.author}</p>}
-                  <span className="inline-block text-[10px] font-semibold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full mt-1">
-                    {item.category}
-                  </span>
                   {item.video_url && (
-                    <span className="inline-block text-[10px] font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full mt-1 ml-1.5">
+                    <span className="inline-block text-[10px] font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full mt-1">
                       🎥 has video
                     </span>
                   )}
